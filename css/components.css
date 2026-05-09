@@ -643,3 +643,45 @@
   .pillars-grid { grid-template-columns: 1fr; }
   .btn { width: 100%; justify-content: center; }
 }
+
+
+/* ── CARD SERIES SPECIFIC ── */
+.card-series-label {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+  margin-bottom: var(--space-2);
+}
+
+.card-series-title {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-black);
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.8px;
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.card-series-desc {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-light);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ── BADGE EXTRA SMALL ── */
+.badge-xs {
+  font-size: 9px;
+  padding: 3px 10px;
+}
+
+/* ── COMING TITLE ── */
+.coming-title {
+  margin-bottom: var(--space-8);
+}
+
+/* ── SECTION LABEL ALT COLOR ── */
+.section-label-alt {
+  color: var(--color-accent2);
+}
