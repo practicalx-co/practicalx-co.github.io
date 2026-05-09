@@ -40,7 +40,7 @@
 
   --font-size-xs:       clamp(16px, 1.8vw, 20px);
   --font-size-sm:       clamp(17px, 1.8vw, 21px);
-  --font-size-base:     17px;
+  --font-size-base:     clamp(17px, 1.8vw, 21px);
   --font-size-md:       clamp(18px, 1.8vw, 22px);
   --font-size-lg:       clamp(19px, 2vw, 23px);
   --font-size-xl:       clamp(20px, 2.5vw, 26px);
