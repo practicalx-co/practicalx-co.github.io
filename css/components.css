@@ -187,7 +187,7 @@
 }
 
 .stat-value span { color: var(--color-accent2); }
-.stat-label { font-size: 12px; font-weight: var(--font-weight-light); color: var(--color-text-muted); }
+.stat-label {  font-size: var(--font-size-xs); font-weight: var(--font-weight-light); color: var(--color-text-muted); }
 
 /* ── PROGRESS BAR ── */
 .progress-wrap { display: flex; flex-direction: column; gap: var(--space-2); }
@@ -288,7 +288,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   flex-shrink: 0;
 }
 
@@ -393,7 +393,7 @@
 
 .coming-label {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-dim);
   letter-spacing: 1.5px;
   text-transform: uppercase;
