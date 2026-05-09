@@ -352,7 +352,7 @@
 }
 
 .pillar-desc {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-light);
   color: var(--color-text-muted);
   line-height: var(--line-height-relaxed);
