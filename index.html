@@ -10,23 +10,23 @@
   <meta property="og:url" content="https://practicalx.co">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 
   <!-- Brand tokens — change here, updates everywhere -->
-  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="css/tokens.css">
   <!-- Base reset and typography -->
-  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="css/base.css">
   <!-- Shared components — nav, footer, buttons, cards -->
-  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="css/components.css">
   <!-- Homepage specific layout -->
-  <link rel="stylesheet" href="/css/pages/home.css">
+  <link rel="stylesheet" href="css/pages/home.css">
 </head>
 <body>
 
   <!-- ── NAVIGATION ── -->
   <nav class="nav" role="navigation" aria-label="Main navigation">
     <a href="/" class="nav-brand" aria-label="PracticalX Home">
-      <img src="/assets/images/xe-mark.svg" alt="XE" class="nav-mark">
+      <img src="assets/images/xe-mark.svg" alt="XE" class="nav-mark">
       <div>
         <div class="nav-name">Practical<span>X</span></div>
         <div class="nav-x-tag">X = AI · 30-Day Series</div>
@@ -149,11 +149,11 @@
                 <span class="badge-dot"></span>
                 Live Now
               </div>
-              <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-muted);letter-spacing:1px;margin-bottom:var(--space-2)">X = AI · 30-Day Series</div>
-              <h3 style="font-size:26px;letter-spacing:-0.8px;">Learning AI<br>Out Loud</h3>
+              <div class="card-series-label">X = AI · 30-Day Series</div>
+              <h3 class="card-series-title">Learning AI<br>Out Loud</h3>
             </div>
             <div class="card-body">
-              <p style="font-size:14px;">One practical toolkit per day. Exercises for everyday users and technical practitioners. Everything you need to go from understanding to doing.</p>
+              <p class="card-series-desc">One practical toolkit per day. Exercises for everyday users and technical practitioners. Everything you need to go from understanding to doing.</p>
 
               <div class="progress-wrap">
                 <div class="progress-meta">
@@ -169,27 +169,27 @@
                 <div class="arc-item active">
                   <span class="arc-num">ARC 1</span>
                   <span class="arc-name">What Even Is This Thing?</span>
-                  <span class="badge badge-green" style="font-size:8px;padding:2px 8px;">Live</span>
+                  <span class="badge badge-green" class="badge-xs">Live</span>
                 </div>
                 <div class="arc-item">
                   <span class="arc-num">ARC 2</span>
                   <span class="arc-name">AI and the People Problem</span>
-                  <span class="badge badge-dim" style="font-size:8px;padding:2px 8px;">Soon</span>
+                  <span class="badge badge-dim" class="badge-xs">Soon</span>
                 </div>
                 <div class="arc-item">
                   <span class="arc-num">ARC 3</span>
                   <span class="arc-name">AI and Security</span>
-                  <span class="badge badge-dim" style="font-size:8px;padding:2px 8px;">Soon</span>
+                  <span class="badge badge-dim" class="badge-xs">Soon</span>
                 </div>
                 <div class="arc-item">
                   <span class="arc-num">ARC 4</span>
                   <span class="arc-name">AI in the Architecture Room</span>
-                  <span class="badge badge-dim" style="font-size:8px;padding:2px 8px;">Soon</span>
+                  <span class="badge badge-dim" class="badge-xs">Soon</span>
                 </div>
                 <div class="arc-item">
                   <span class="arc-num">ARC 5</span>
                   <span class="arc-name">What I'm Still Learning</span>
-                  <span class="badge badge-dim" style="font-size:8px;padding:2px 8px;">Soon</span>
+                  <span class="badge badge-dim" class="badge-xs">Soon</span>
                 </div>
               </div>
             </div>
@@ -295,7 +295,7 @@
     <section class="coming-section" aria-label="Future series">
       <div class="coming-inner">
         <span class="section-label reveal">Coming Next</span>
-        <h2 class="reveal" style="margin-bottom:var(--space-8)">Future Series</h2>
+        <h2 class="reveal coming-title">Future Series</h2>
         <div class="coming-list">
           <div class="coming-card reveal">
             <div class="coming-x" aria-hidden="true">X</div>
@@ -329,7 +329,7 @@
     <div class="cta-band">
       <div class="cta-inner reveal">
         <div class="cta-glow" aria-hidden="true"></div>
-        <span class="section-label" style="color:var(--color-accent2)">Join the Journey</span>
+        <span class="section-label section-label-alt">Join the Journey</span>
         <h2>Still learning.<br>Always building.</h2>
         <p>Follow the Learning AI Out Loud series on LinkedIn — one practical nugget every day, with a free toolkit to go hands-on immediately.</p>
         <div class="cta-actions">
@@ -348,7 +348,7 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <a href="/" class="footer-brand-row" aria-label="PracticalX Home">
-          <img src="/assets/images/xe-mark.svg" alt="XE" class="footer-mark">
+          <img src="assets/images/xe-mark.svg" alt="XE" class="footer-mark">
           <div class="footer-name">Practical<span>X</span></div>
         </a>
         <div class="footer-tagline">Still learning. Always building. Sharing what sticks.</div>
@@ -366,9 +366,9 @@
   </footer>
 
   <!-- Scripts loaded at end for performance -->
-  <script src="/js/nav.js" defer></script>
-  <script src="/js/animations.js" defer></script>
-  <script src="/js/progress.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/animations.js" defer></script>
+  <script src="js/progress.js" defer></script>
 
 </body>
 </html>
