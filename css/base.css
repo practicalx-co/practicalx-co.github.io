@@ -54,7 +54,7 @@ h3 { font-size: var(--font-size-xl); letter-spacing: var(--letter-spacing-snug);
 h4 { font-size: var(--font-size-lg); letter-spacing: var(--letter-spacing-snug); }
 
 p {
-  font-size: clamp(15px, 1.6vw, 18px);
+  font-size: clamp(16px, 1.6vw, 20px);
   line-height: var(--line-height-relaxed);
   color: var(--color-text-muted);
   font-weight: var(--font-weight-light);
