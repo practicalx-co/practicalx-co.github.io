@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX — Learning AI Out Loud · Complete Resource Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --surface-alt: #F4F3F0;
+    --accent: #5B3FBF;
+    --accent-light: #EDE9FA;
+    --accent2: #00B4CC;
+    --accent2-light: #E6F8FB;
+    --green: #1A7F5A;
+    --green-light: #E6F5EF;
+    --blue: #1A4F9F;
+    --blue-light: #E6EEFA;
+    --amber: #B45A00;
+    --amber-light: #FEF3E6;
+    --text: #1A1A2E;
+    --text-muted: #6B6B80;
+    --text-light: #9999AA;
+    --border: #E2E2E8;
+    --border-strong: #C8C8D8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  @media print {
+    /* Base */
+    body { background: white; font-size: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none !important; }
+    .page { box-shadow: none; margin: 0; border-radius: 0; max-width: 100%; }
+
+    /* Ink-friendly header */
+    .header { background: white !important; border-bottom: 3px solid var(--accent); padding: 32px 40px 28px; }
+    .header::before { display: none; }
+    .header::after { display: none; }
+    .brand-name { color: var(--text) !important; }
+    .brand-mark { background: var(--accent) !important; }
+    .brand-series { color: var(--text-muted) !important; }
+    .header-label { color: var(--accent) !important; }
+    .header-title { color: var(--text) !important; }
+    .header-subtitle { color: var(--text-muted) !important; }
+    .header-quote { color: var(--text-muted) !important; }
+
+    /* Ink-friendly footer */
+    .footer { background: white !important; border-top: 2px solid var(--border); padding: 24px 40px; }
+    .footer-brand-name { color: var(--text) !important; }
+    .footer-series { color: var(--text-muted) !important; }
+    .footer-link { color: var(--accent) !important; }
+    .footer-updated { color: var(--text-muted) !important; }
+
+    /* Page break rules */
+    .arc-section { break-inside: avoid; page-break-inside: avoid; }
+    .arc-header { break-after: avoid; page-break-after: avoid; }
+    .day-row { break-inside: avoid; page-break-inside: avoid; }
+    .how-to-use { break-inside: avoid; page-break-inside: avoid; }
+    .about { break-inside: avoid; page-break-inside: avoid; }
+
+    /* Body padding tighter for print */
+    .body { padding: 24px 40px; gap: 28px; }
+
+    /* Links visible */
+    a { color: var(--accent) !important; text-decoration: underline !important; }
+  }
+
+  .page {
+    max-width: 920px;
+    margin: 40px auto;
+    background: var(--surface);
+    border-radius: 12px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--text);
+    padding: 52px 60px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle, rgba(91,63,191,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .brand-meta { display: flex; flex-direction: column; gap: 2px; }
+
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+    letter-spacing: -0.2px;
+  }
+
+  .brand-name span { color: var(--accent2); }
+
+  .brand-series {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1.5px;
+  }
+
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    color: white;
+    line-height: 1.12;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    max-width: 600px;
+  }
+
+  .header-subtitle {
+    font-size: 15px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 20px;
+  }
+
+  .header-quote {
+    font-size: 13px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255,255,255,0.45);
+    border-left: 2px solid var(--accent);
+    padding-left: 14px;
+    max-width: 480px;
+  }
+
+  /* ── HOW TO USE ── */
+  .how-to-use {
+    background: var(--accent-light);
+    padding: 24px 60px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .how-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .how-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .how-text {
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.5;
+  }
+
+  .how-text strong { font-weight: 600; }
+
+  /* ── BODY ── */
+  .body { padding: 48px 60px; display: flex; flex-direction: column; gap: 40px; }
+
+  /* ── ARC SECTION ── */
+  .arc-section { display: flex; flex-direction: column; gap: 16px; }
+
+  .arc-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .arc-badge {
+    background: var(--text);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .arc-title-block { display: flex; flex-direction: column; gap: 2px; }
+
+  .arc-days {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+  }
+
+  .arc-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--text);
+    letter-spacing: -0.2px;
+  }
+
+  /* ── DAY ROWS ── */
+  .day-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .day-row:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  .day-num {
+    width: 64px;
+    min-height: 56px;
+    background: var(--surface-alt);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+    padding: 12px 8px;
+  }
+
+  .day-num-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .day-num-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .day-content {
+    flex: 1;
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .day-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    letter-spacing: -0.2px;
+  }
+
+  .day-title a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .day-title a:hover { color: #4A2FAF; text-decoration: underline; }
+
+  .day-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .day-status {
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 16px;
+    border-left: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .status-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .status-available {
+    background: var(--green-light);
+    color: var(--green);
+    border: 1px solid rgba(26,127,90,0.2);
+  }
+
+  .status-coming {
+    background: var(--surface-alt);
+    color: var(--text-light);
+    border: 1px solid var(--border);
+  }
+
+  .status-today {
+    background: var(--amber-light);
+    color: var(--amber);
+    border: 1px solid rgba(180,90,0,0.2);
+  }
+
+  /* ── ABOUT ── */
+  .about {
+    background: var(--surface-alt);
+    border-radius: 10px;
+    padding: 24px 28px;
+    border-left: 3px solid var(--accent);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .about-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .about-text { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--text);
+    padding: 32px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand { display: flex; flex-direction: column; gap: 4px; }
+
+  .footer-brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+  }
+
+  .footer-brand-name span { color: var(--accent2); }
+
+  .footer-series {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+  }
+
+  .footer-links { display: flex; flex-direction: column; gap: 6px; text-align: right; }
+
+  .footer-link {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-weight: 300;
+    transition: color 0.2s;
+  }
+
+  .footer-link:hover { color: var(--accent2); }
+  .footer-link span { color: var(--accent2); }
+
+  .footer-updated {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* ── PRINT BUTTON ── */
+  .print-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(91,63,191,0.3);
+    transition: all 0.2s;
+    z-index: 100;
+  }
+
+  .print-btn:hover { background: #4A2FAF; transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-label">Complete Resource Index</div>
+    <div class="header-title">Learning AI<br>Out Loud</div>
+    <div class="header-subtitle">30 days. One practical AI nugget every day. All the toolkits in one place.</div>
+    <div class="header-quote">Sharing requires preparation. And preparation requires learning.</div>
+  </div>
+
+  <!-- HOW TO USE -->
+  <div class="how-to-use">
+    <div class="how-item">
+      <div class="how-num">1</div>
+      <div class="how-text"><strong>New to AI?</strong> Start at Day 1 and work through each toolkit in order.</div>
+    </div>
+    <div class="how-item">
+      <div class="how-num">2</div>
+      <div class="how-text"><strong>Looking for something specific?</strong> Jump to any arc or day that matches your current challenge.</div>
+    </div>
+    <div class="how-item">
+      <div class="how-num">3</div>
+      <div class="how-text"><strong>Each toolkit</strong> has exercises for everyday users and technical practitioners.</div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- ARC 1 -->
+    <div class="arc-section">
+      <div class="arc-header">
+        <div class="arc-badge">ARC 1</div>
+        <div class="arc-title-block">
+          <div class="arc-days">DAYS 01 — 06</div>
+          <div class="arc-title">What Even Is This Thing? — Demystifying AI Vocabulary</div>
+        </div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">01</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title"><a href="#">Agentic AI — Tool or Colleague?</a></div>
+          <div class="day-desc">The difference between reactive AI and Agentic AI — and why it changes everything about how you work with it.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-available">Available</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">02</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title"><a href="#">The Whiteboard Always Gets Erased</a></div>
+          <div class="day-desc">Why AI has no persistent memory, how context windows work, and why asking AI to remember changes everything.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-available">Available</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">03</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title"><a href="/content/ai/day-03-teaching-ai-your-world.html">Teaching AI Your World</a></div>
+          <div class="day-desc">What RAG means, why generic AI output happens, and how to give AI the context it needs to be genuinely useful.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-available">Available</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">04</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Where Does AI Live in Your Architecture?</div>
+          <div class="day-desc">How to correctly place AI components in a C4 diagram and why most teams draw that box in the wrong place.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">05</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The Hallucination Problem — Confidently Wrong</div>
+          <div class="day-desc">What AI hallucination actually is, why it happens, and the practical checks that help you catch it before it matters.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">06</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Fine Tuning vs Prompting — When Does Each Make Sense?</div>
+          <div class="day-desc">The difference between fine tuning a model and prompting it well — and how to know which one your situation actually needs.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ARC 2 -->
+    <div class="arc-section">
+      <div class="arc-header">
+        <div class="arc-badge">ARC 2</div>
+        <div class="arc-title-block">
+          <div class="arc-days">DAYS 07 — 12</div>
+          <div class="arc-title">AI and the People Problem — Adoption, Mindset, Culture</div>
+        </div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">07</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Why Your Best Employee May Be Last to Adopt AI</div>
+          <div class="day-desc">The surprising pattern in AI adoption and what it tells you about expertise, identity, and the fear of being replaced.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">08</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The Centaur Model — Human Plus AI</div>
+          <div class="day-desc">Why the most useful mental model for working with AI isn't replacement — it's partnership. Human strength plus AI speed.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">09</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Prompt Engineering Is a Skill. So Is Knowing When Not to Prompt</div>
+          <div class="day-desc">What good prompting actually looks like — and the equally important skill of knowing when AI is the wrong tool entirely.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">10</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">AI Doesn't Have a Strategy Problem. Your Organization Does</div>
+          <div class="day-desc">Why most AI initiatives stall — and why the bottleneck is almost never the technology.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">11</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The Trust Gap — Why People Use AI in Secret</div>
+          <div class="day-desc">Shadow AI is already in your organization. What that tells you about culture, trust, and what needs to change.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">12</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">What My Daughter Taught Me About AI Adoption</div>
+          <div class="day-desc">A personal story about learning, resistance, and why the best lessons about AI adoption sometimes come from unexpected places.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ARC 3 -->
+    <div class="arc-section">
+      <div class="arc-header">
+        <div class="arc-badge">ARC 3</div>
+        <div class="arc-title-block">
+          <div class="arc-days">DAYS 13 — 18</div>
+          <div class="arc-title">AI and Security — The Part Nobody Wants to Talk About</div>
+        </div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">13</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Prompt Injection — The SQL Injection of the AI Era</div>
+          <div class="day-desc">The attack vector most AI deployments aren't protected against — and why it matters more as AI gets more autonomous.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">14</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Your Data Is the Moat. AI Just Made It a Bigger Target</div>
+          <div class="day-desc">Why AI amplifies both the value of your data and the risk of losing it — and what that means for how you govern it.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">15</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Shadow AI Is Already in Your Organization</div>
+          <div class="day-desc">How to think about unsanctioned AI use — and why the answer isn't a blanket ban.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">16</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Least Privilege for AI Agents</div>
+          <div class="day-desc">Why the security principle you already know applies directly to AI agents — and what happens when you ignore it.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">17</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">What Can This Agent Do Without Asking?</div>
+          <div class="day-desc">The governance question nobody asks before deploying an AI agent — and why it should be the first question.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">18</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Third Party Model Risk Is the New Third Party Software Risk</div>
+          <div class="day-desc">Why AI in your supply chain deserves the same scrutiny as any third party software dependency — and how to approach it.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ARC 4 -->
+    <div class="arc-section">
+      <div class="arc-header">
+        <div class="arc-badge">ARC 4</div>
+        <div class="arc-title-block">
+          <div class="arc-days">DAYS 19 — 24</div>
+          <div class="arc-title">AI in the Architecture Room — C4, Cloud, and Infrastructure</div>
+        </div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">19</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Where Does AI Sit in a C4 Diagram?</div>
+          <div class="day-desc">Most teams put AI in the wrong box. Here is how to model it correctly and why the placement changes your whole architecture conversation.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">20</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Stateless vs Stateful AI Agents</div>
+          <div class="day-desc">Why this distinction changes how you architect everything around an AI agent — and the failure modes of getting it wrong.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">21</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The Infrastructure Cost of AI Nobody Budgets For</div>
+          <div class="day-desc">Latency, retry logic, token bills, and the hidden costs that show up after your AI pilot becomes a production system.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">22</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Why IaC Discipline Matters More With AI</div>
+          <div class="day-desc">Why Terraform and infrastructure as code discipline becomes more important, not less, when AI is part of your stack.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">23</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">Multi Agent Orchestration Is a Distributed Systems Problem</div>
+          <div class="day-desc">Why multi-agent AI isn't magic — it's a distributed systems challenge with a new name and familiar failure modes.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">24</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The Context Collapse Problem in AI Systems</div>
+          <div class="day-desc">What context collapse is, why it breaks AI systems at scale, and the architecture pattern that helps prevent it.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ARC 5 -->
+    <div class="arc-section">
+      <div class="arc-header">
+        <div class="arc-badge">ARC 5</div>
+        <div class="arc-title-block">
+          <div class="arc-days">DAYS 25 — 30</div>
+          <div class="arc-title">What I'm Still Learning — Humility, Reflection, and What's Next</div>
+        </div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">25</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The AI Question I Got Completely Wrong</div>
+          <div class="day-desc">An honest look at the assumption I held about AI that turned out to be wrong — and what replacing it taught me.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">26</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The Metric I Wish I'd Tracked From Day One</div>
+          <div class="day-desc">The measurement that would have made every AI experiment more useful — and how to start tracking it from wherever you are now.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">27</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">What a Failed AI Pilot Taught Me</div>
+          <div class="day-desc">The lessons from an AI initiative that didn't work — and why failed pilots teach you more than successful ones ever could.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">28</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The Book, Paper or Conversation That Changed How I Think</div>
+          <div class="day-desc">The single resource that shifted my mental model of AI more than anything else — and why I think it will do the same for you.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">29</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">30 Days In — What Shifted and What Didn't</div>
+          <div class="day-desc">An honest reflection on 29 days of learning AI out loud — what changed, what surprised me, and what I got wrong.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+
+      <div class="day-row">
+        <div class="day-num">
+          <div class="day-num-label">Day</div>
+          <div class="day-num-value">30</div>
+        </div>
+        <div class="day-content">
+          <div class="day-title">The One Question I'm Carrying Into the Next 30 Days</div>
+          <div class="day-desc">The series ends but the learning doesn't. The single open question that's shaping everything I'm thinking about next.</div>
+        </div>
+        <div class="day-status"><div class="status-pill status-coming">Coming Soon</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ABOUT -->
+    <div class="about">
+      <div class="about-title">About PracticalX</div>
+      <div class="about-text">PracticalX is a learning philosophy built on one belief — you don't truly understand something until you've done it. X is always the subject. The approach never changes: break it down, get hands-on, make it land, then share it. Currently: X = AI.</div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-updated">LAST UPDATED · DAY 03 OF 30</div>
+    </div>
+  </div>
+
+</div>
+
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+</body>
+</html>

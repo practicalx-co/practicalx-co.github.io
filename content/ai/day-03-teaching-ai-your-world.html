@@ -38,11 +38,53 @@
 
   /* ── PRINT ── */
   @media print {
-    body { background: white; font-size: 13px; }
+    /* Base */
+    body { background: white; font-size: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .no-print { display: none !important; }
-    .page { box-shadow: none; margin: 0; border-radius: 0; }
+    .page { box-shadow: none; margin: 0; border-radius: 0; max-width: 100%; }
+
+    /* Ink-friendly header — convert dark to light */
+    .header { background: white !important; border-bottom: 3px solid var(--accent); padding: 32px 40px 28px; }
+    .header::before { display: none; }
+    .header::after { display: none; }
+    .brand-name { color: var(--text) !important; }
+    .brand-mark { background: var(--accent) !important; }
+    .brand-series { color: var(--text-muted) !important; }
+    .header-day { color: var(--accent) !important; }
+    .header-title { color: var(--text) !important; }
+    .header-quote { color: var(--text-muted) !important; border-left-color: var(--accent) !important; }
+
+    /* Ink-friendly footer */
+    .footer { background: white !important; border-top: 2px solid var(--border); padding: 24px 40px; }
+    .footer-brand-name { color: var(--text) !important; }
+    .footer-series { color: var(--text-muted) !important; }
+    .footer-link { color: var(--accent) !important; }
+    .footer-day { color: var(--text-muted) !important; }
+
+    /* Page break rules — never cut these elements */
     .section { break-inside: avoid; }
-    a { color: var(--accent) !important; }
+    .exercise { break-inside: avoid; page-break-inside: avoid; }
+    .exercise-header { break-after: avoid; page-break-after: avoid; }
+    .prompt-box { break-inside: avoid; page-break-inside: avoid; }
+    .challenge { break-inside: avoid; page-break-inside: avoid; }
+    .arch-block { break-inside: avoid; page-break-inside: avoid; }
+    .arch-step { break-inside: avoid; page-break-inside: avoid; }
+    .privacy { break-inside: avoid; page-break-inside: avoid; }
+    .resources { break-inside: avoid; page-break-inside: avoid; }
+    .notice { break-inside: avoid; page-break-inside: avoid; }
+    .core-idea { break-inside: avoid; page-break-inside: avoid; }
+    .intro-band { break-inside: avoid; page-break-inside: avoid; }
+    .section-header { break-after: avoid; page-break-after: avoid; }
+
+    /* Keep section header with its first exercise */
+    .section-header + .section-meta { break-before: avoid; page-break-before: avoid; }
+    .section-meta + .exercise { break-before: avoid; page-break-before: avoid; }
+
+    /* Body padding tighter for print */
+    .body { padding: 24px 40px; gap: 28px; }
+
+    /* Links visible in print */
+    a { color: var(--accent) !important; text-decoration: underline !important; }
   }
 
   /* ── LAYOUT ── */
@@ -574,6 +616,48 @@
     margin-top: 4px;
   }
 
+  /* ── BACK NAV ── */
+  .back-nav {
+    max-width: 860px;
+    margin: 24px auto 0;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+    transition: gap 0.2s;
+  }
+
+  .back-link:hover { gap: 12px; }
+
+  .back-arrow {
+    font-size: 16px;
+    transition: transform 0.2s;
+  }
+
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+
+  .back-home {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-light);
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+  }
+
+  .back-home:hover { color: var(--accent); }
+
   /* ── PRINT BUTTON ── */
   .print-btn {
     position: fixed;
@@ -597,6 +681,15 @@
 </style>
 </head>
 <body>
+
+<!-- ── BACK NAV ── -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
 
 <div class="page">
 
