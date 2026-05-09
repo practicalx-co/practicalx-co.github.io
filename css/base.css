@@ -21,7 +21,7 @@ body {
   background: var(--color-bg);
   font-family: var(--font-body);
   font-weight: var(--font-weight-regular);
-  font-size: var(--font-size-base);
+  font-size: clamp(15px, 1.6vw, 18px);
   line-height: var(--line-height-normal);
   color: var(--color-text);
   overflow-x: hidden;
@@ -54,7 +54,7 @@ h3 { font-size: var(--font-size-xl); letter-spacing: var(--letter-spacing-snug);
 h4 { font-size: var(--font-size-lg); letter-spacing: var(--letter-spacing-snug); }
 
 p {
-  font-size: var(--font-size-base);
+  font-size: clamp(15px, 1.6vw, 18px);
   line-height: var(--line-height-relaxed);
   color: var(--color-text-muted);
   font-weight: var(--font-weight-light);

@@ -38,15 +38,15 @@
   --font-body:          'DM Sans', sans-serif;
   --font-mono:          'DM Mono', monospace;
 
-  --font-size-xs:       11px;
-  --font-size-sm:       13px;
+  --font-size-xs:       clamp(11px, 1.2vw, 13px);
+  --font-size-sm:       clamp(13px, 1.4vw, 15px);
   --font-size-base:     15px;
-  --font-size-md:       17px;
-  --font-size-lg:       20px;
-  --font-size-xl:       24px;
-  --font-size-2xl:      32px;
-  --font-size-3xl:      44px;
-  --font-size-4xl:      60px;
+  --font-size-md:       clamp(16px, 1.8vw, 20px);
+  --font-size-lg:       clamp(18px, 2vw, 22px);
+  --font-size-xl:       clamp(20px, 2.5vw, 26px);
+  --font-size-2xl:      clamp(24px, 3vw, 34px);
+  --font-size-3xl:      clamp(32px, 4vw, 48px);
+  --font-size-4xl:      clamp(44px, 5.5vw, 64px);
   --font-size-hero:     clamp(44px, 7vw, 84px);
 
   --font-weight-light:  300;
