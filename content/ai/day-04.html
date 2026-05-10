@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 4 · AI Said It. Doesn't Mean It's True.</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --surface-alt: #F4F3F0;
+    --accent: #5B3FBF;
+    --accent-light: #EDE9FA;
+    --accent2: #00B4CC;
+    --accent2-light: #E6F8FB;
+    --green: #1A7F5A;
+    --green-light: #E6F5EF;
+    --blue: #1A4F9F;
+    --blue-light: #E6EEFA;
+    --amber: #B45A00;
+    --amber-light: #FEF3E6;
+    --red: #9B1C1C;
+    --red-light: #FEE2E2;
+    --text: #1A1A2E;
+    --text-muted: #6B6B80;
+    --text-light: #9999AA;
+    --border: #E2E2E8;
+    --border-strong: #C8C8D8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    color: var(--text);
+    font-size: clamp(15px, 1.6vw, 18px);
+    line-height: 1.7;
+  }
+
+  @media print {
+    body { background: white; font-size: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .no-print { display: none !important; }
+    .page { box-shadow: none; margin: 0; border-radius: 0; max-width: 100%; }
+    .header { background: white !important; border-bottom: 3px solid var(--accent); padding: 32px 40px 28px; }
+    .header::before, .header::after { display: none; }
+    .brand-name { color: var(--text) !important; }
+    .brand-mark { background: var(--accent) !important; }
+    .brand-series { color: var(--text-muted) !important; }
+    .header-day { color: var(--accent) !important; }
+    .header-title { color: var(--text) !important; }
+    .header-quote { color: var(--text-muted) !important; border-left-color: var(--accent) !important; }
+    .footer { background: white !important; border-top: 2px solid var(--border); padding: 24px 40px; }
+    .footer-brand-name { color: var(--text) !important; }
+    .footer-series { color: var(--text-muted) !important; }
+    .footer-link { color: var(--accent) !important; }
+    .footer-day { color: var(--text-muted) !important; }
+    .section { break-inside: avoid; }
+    .exercise { break-inside: avoid; page-break-inside: avoid; }
+    .exercise-header { break-after: avoid; page-break-after: avoid; }
+    .prompt-box { break-inside: avoid; page-break-inside: avoid; }
+    .challenge { break-inside: avoid; page-break-inside: avoid; }
+    .arch-block { break-inside: avoid; page-break-inside: avoid; }
+    .privacy { break-inside: avoid; page-break-inside: avoid; }
+    .resources { break-inside: avoid; page-break-inside: avoid; }
+    .notice { break-inside: avoid; page-break-inside: avoid; }
+    .core-idea { break-inside: avoid; page-break-inside: avoid; }
+    .disclaimer { break-inside: avoid; page-break-inside: avoid; }
+    .section-header { break-after: avoid; page-break-after: avoid; }
+    .body { padding: 24px 40px; gap: 28px; }
+    a { color: var(--accent) !important; text-decoration: underline !important; }
+  }
+
+  /* ── BACK NAV ── */
+  .back-nav {
+    max-width: 860px;
+    margin: 24px auto 0;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+    transition: gap 0.2s;
+  }
+
+  .back-link:hover { gap: 12px; }
+  .back-arrow { font-size: 16px; transition: transform 0.2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+
+  .back-home {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-light);
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+  }
+
+  .back-home:hover { color: var(--accent); }
+
+  /* ── PAGE ── */
+  .page {
+    max-width: 860px;
+    margin: 24px auto 40px;
+    background: var(--surface);
+    border-radius: 12px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--text);
+    padding: 48px 56px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(91,63,191,0.3) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .brand-mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .brand-meta { display: flex; flex-direction: column; gap: 1px; }
+
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    letter-spacing: -0.2px;
+  }
+
+  .brand-name span { color: var(--accent2); }
+
+  .brand-series {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 1px;
+  }
+
+  .header-day {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(24px, 3.5vw, 32px);
+    color: white;
+    line-height: 1.15;
+    letter-spacing: -0.8px;
+    margin-bottom: 14px;
+    max-width: 560px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header-quote {
+    font-size: clamp(13px, 1.4vw, 15px);
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255,255,255,0.6);
+    border-left: 2px solid var(--accent);
+    padding-left: 14px;
+    max-width: 520px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── INTRO BAND ── */
+  .intro-band {
+    background: var(--accent-light);
+    padding: 20px 56px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .intro-band p { font-size: clamp(13px, 1.4vw, 15px); color: var(--accent); }
+  .intro-band strong { font-weight: 600; }
+
+  /* ── SERIES CONNECT ── */
+  .series-connect {
+    background: var(--surface-alt, #F4F3F0);
+    border-left: 3px solid var(--accent2);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* ── BODY ── */
+  .body {
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* ── SECTION ── */
+  .section { display: flex; flex-direction: column; gap: 20px; }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-badge {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .badge-green { background: var(--green-light); }
+  .badge-blue { background: var(--blue-light); }
+  .badge-purple { background: var(--accent-light); }
+  .badge-amber { background: var(--amber-light); }
+  .badge-red { background: var(--red-light); }
+
+  .section-title-block { display: flex; flex-direction: column; gap: 3px; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(16px, 2vw, 20px);
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+
+  .section-title.green { color: var(--green); }
+  .section-title.blue { color: var(--blue); }
+  .section-title.red { color: var(--red); }
+
+  .section-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .meta-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--text-light);
+    flex-shrink: 0;
+  }
+
+  /* ── CORE IDEA ── */
+  .core-idea {
+    background: var(--surface-alt, #F4F3F0);
+    border-radius: 10px;
+    padding: 24px 28px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .core-idea p { font-size: clamp(14px, 1.5vw, 16px); line-height: 1.7; color: var(--text); }
+
+  .core-idea .pullquote {
+    margin-top: 14px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(14px, 1.6vw, 17px);
+    color: var(--accent);
+    letter-spacing: -0.2px;
+  }
+
+  /* ── DISCLAIMER ── */
+  .disclaimer {
+    background: var(--amber-light);
+    border: 1px solid rgba(180,90,0,0.2);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .disclaimer-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+
+  .disclaimer-content { display: flex; flex-direction: column; gap: 8px; }
+
+  .disclaimer-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--amber);
+  }
+
+  .disclaimer-text {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: #5C3A00;
+    line-height: 1.65;
+  }
+
+  .disclaimer-text p + p { margin-top: 8px; }
+
+  /* ── EXERCISE ── */
+  .exercise {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .exercise-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .exercise-header.green { background: var(--green-light); }
+  .exercise-header.blue { background: var(--blue-light); }
+  .exercise-header.red { background: var(--red-light); }
+
+  .exercise-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  .exercise-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+  }
+
+  .exercise-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .exercise-body p { font-size: clamp(13px, 1.4vw, 15px); color: var(--text-muted); }
+
+  /* ── PROMPT BOX ── */
+  .prompt-box {
+    background: #F8F7FF;
+    border: 1px solid #DDD8F8;
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+
+  .prompt-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  .prompt-text {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(11px, 1.2vw, 13px);
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  .prompt-text .placeholder {
+    background: rgba(91,63,191,0.12);
+    border-radius: 3px;
+    padding: 0 3px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ── NOTICE ── */
+  .notice {
+    background: var(--surface-alt, #F4F3F0);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .notice strong { color: var(--text); font-style: normal; font-weight: 500; }
+
+  /* ── CHALLENGE ── */
+  .challenge {
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .challenge.green { background: var(--green-light); border: 1px solid rgba(26,127,90,0.2); }
+  .challenge.blue { background: var(--blue-light); border: 1px solid rgba(26,79,159,0.2); }
+
+  .challenge-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .challenge-content { display: flex; flex-direction: column; gap: 4px; }
+
+  .challenge-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .challenge-text { font-size: clamp(13px, 1.4vw, 15px); line-height: 1.6; }
+  .challenge-text.green { color: var(--green); font-weight: 500; }
+  .challenge-text.blue { color: var(--blue); font-weight: 500; }
+
+  /* ── ARCH BLOCK ── */
+  .arch-block {
+    background: var(--surface-alt, #F4F3F0);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .arch-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .arch-step { display: flex; gap: 14px; align-items: flex-start; }
+
+  .arch-step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .arch-step-content { display: flex; flex-direction: column; gap: 2px; }
+  .arch-step-title { font-weight: 600; font-size: clamp(13px, 1.4vw, 15px); color: var(--text); }
+  .arch-step-desc { font-size: clamp(12px, 1.3vw, 14px); color: var(--text-muted); line-height: 1.6; }
+
+  /* ── PRIVACY ── */
+  .privacy {
+    background: #FFF8E6;
+    border: 1px solid #F5D87A;
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 14px;
+  }
+
+  .privacy-icon { font-size: 20px; flex-shrink: 0; }
+  .privacy-content { display: flex; flex-direction: column; gap: 8px; }
+
+  .privacy-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: #7A5500;
+  }
+
+  .privacy-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+
+  .privacy-list li {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: #5C4000;
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.6;
+  }
+
+  .privacy-list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 9px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #7A5500;
+    opacity: 0.4;
+  }
+
+  /* ── RESOURCES ── */
+  .resources {
+    background: var(--surface-alt, #F4F3F0);
+    border-radius: 10px;
+    padding: 20px 24px;
+  }
+
+  .resources-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .resource-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+  .resource-list li {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text-muted);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.6;
+  }
+
+  .resource-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 11px;
+    top: 1px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--text);
+    padding: 32px 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand { display: flex; flex-direction: column; gap: 4px; }
+
+  .footer-brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: white;
+  }
+
+  .footer-brand-name span { color: var(--accent2); }
+
+  .footer-series {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+  }
+
+  .footer-links { display: flex; flex-direction: column; gap: 6px; text-align: right; }
+
+  .footer-link {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    font-weight: 300;
+    transition: color 0.2s;
+  }
+
+  .footer-link:hover { color: var(--accent2); }
+  .footer-link span { color: var(--accent2); }
+
+  .footer-day {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* ── PRINT BUTTON ── */
+  .print-btn {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(91,63,191,0.3);
+    transition: all 0.2s;
+    z-index: 100;
+  }
+
+  .print-btn:hover { background: #4A2FAF; transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+<!-- ── BACK NAV ── -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 04 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">AI Said It.<br>Doesn't Mean It's True.</div>
+    <div class="header-quote">AI doesn't guess. It fabricates. And presents it as truth.</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p><strong>What this toolkit is:</strong> A practical companion to Day 4 of Learning AI Out Loud. No theory. No fluff. Exercises that demonstrate AI hallucination firsthand — so you recognize it when it matters, not after it's caused a problem.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      In Days 1 through 3 we established that AI is a capable colleague — but one with no memory unless you build it, and no knowledge of your world unless you give it. Today we add one more dimension: that colleague sometimes fabricates answers. Confidently. Without warning.
+    </div>
+
+    <!-- CORE IDEA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-purple">💡</div>
+        <div class="section-title-block">
+          <div class="section-label">Foundation</div>
+          <div class="section-title">The Core Idea</div>
+        </div>
+      </div>
+      <div class="core-idea">
+        <p>AI hallucination is not a bug or a malfunction. It's a fundamental characteristic of how large language models work. AI generates the most plausible next word based on patterns in its training — it has no internal mechanism to distinguish between what it knows and what it's guessing. The result is fluent, confident, sometimes completely fabricated output. Understanding this changes how you use every AI tool you have.</p>
+        <div class="pullquote">AI doesn't guess. It fabricates. And presents it as truth.</div>
+      </div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="disclaimer">
+      <div class="disclaimer-icon">⚠️</div>
+      <div class="disclaimer-content">
+        <div class="disclaimer-title">A Note Before You Start</div>
+        <div class="disclaimer-text">
+          <p>AI tools are improving rapidly. The exercises in this toolkit are designed to demonstrate hallucination tendencies — but your experience may differ from what's described here. Some tools handle these scenarios better than others. Newer model versions may catch errors that older ones missed. And the same prompt on the same tool can produce different results on different days.</p>
+          <p>That's actually part of the lesson. Hallucination isn't a fixed, predictable behavior — it varies across models, versions, prompts, and contexts. If an exercise doesn't produce the expected result, that's not failure. It's data. Note which tool you used, which version, and what it did differently. That observation is more valuable than a textbook demonstration.</p>
+          <p>The goal isn't to catch AI failing. It's to build the instinct to verify — regardless of how confident the output sounds.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- TRY IT NOW -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-green">🟢</div>
+        <div class="section-title-block">
+          <div class="section-label">For everyday users — no technical knowledge needed</div>
+          <div class="section-title green">Try It Now</div>
+        </div>
+      </div>
+
+      <div class="section-meta">
+        <div class="meta-item"><div class="meta-dot"></div>Any AI tool — ChatGPT, Claude, Microsoft Copilot</div>
+        <div class="meta-item"><div class="meta-dot"></div>15 minutes</div>
+        <div class="meta-item"><div class="meta-dot"></div>Firsthand experience of hallucination</div>
+      </div>
+
+      <!-- Exercise 1 -->
+      <div class="exercise">
+        <div class="exercise-header green">
+          <div class="exercise-number">EXERCISE 01</div>
+          <div class="exercise-title">The Fake Citation Test</div>
+        </div>
+        <div class="exercise-body">
+          <p>The most reliable way to trigger and observe hallucination. Ask AI for academic citations on a very specific topic:</p>
+          <div class="prompt-box">
+            <div class="prompt-label">Copy · Paste · Run</div>
+            <div class="prompt-text">"Can you give me three academic papers about the effect of intermittent fasting on marathon recovery time, published between 2018 and 2022? Please include authors, journal names, and publication dates."</div>
+          </div>
+          <div class="notice"><strong>What to notice:</strong> AI will almost certainly generate plausible-sounding citations — realistic author names, credible journal titles, believable dates. Then search for them. Most will not exist. This is hallucination at its clearest — confident, specific, completely fabricated.</div>
+        </div>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="exercise">
+        <div class="exercise-header green">
+          <div class="exercise-number">EXERCISE 02</div>
+          <div class="exercise-title">The False Premise Test</div>
+        </div>
+        <div class="exercise-body">
+          <p>Feed AI a statement that contains a factual error and see if it corrects you or builds on the fabrication:</p>
+          <div class="prompt-box">
+            <div class="prompt-label">Copy · Paste · Run</div>
+            <div class="prompt-text">"As Einstein said in his 1956 speech on artificial intelligence, machines will eventually surpass human creativity. Can you expand on this idea and what it means for AI today?"</div>
+          </div>
+          <div class="notice"><strong>What to notice:</strong> Einstein died in 1955 and never gave a speech on artificial intelligence. Watch whether AI corrects the false premise or builds confidently on top of it. Many AI tools will validate the fabrication rather than challenge it.</div>
+        </div>
+      </div>
+
+      <!-- Exercise 3 -->
+      <div class="exercise">
+        <div class="exercise-header green">
+          <div class="exercise-number">EXERCISE 03</div>
+          <div class="exercise-title">The Memory Calculation Test</div>
+        </div>
+        <div class="exercise-body">
+          <p>This mirrors a real situation many people encounter. Log information across several messages in the same conversation then ask AI to calculate a total. Send these messages one at a time:</p>
+          <div class="prompt-box">
+            <div class="prompt-label">Send as separate messages in sequence</div>
+            <div class="prompt-text">Message 1: "I had 40g of protein at breakfast."
+Message 2: "I had 35g of protein at lunch."
+Message 3: "I had 50g of protein at dinner."
+Message 4: "I had 20g of protein as a snack."
+
+Then ask: "How much total protein did I consume today?"
+
+Now try again — skip Message 2 entirely. Go from Message 1 straight to Message 3. Ask the same question.</div>
+          </div>
+          <div class="notice"><strong>What to notice:</strong> Does AI flag the gap and note the missing entry? Or does it calculate confidently based on incomplete information without any caveat? This is hallucination in everyday workflow — the kind that costs you without ever announcing itself.</div>
+        </div>
+      </div>
+
+      <!-- Challenge -->
+      <div class="challenge green">
+        <div class="challenge-icon">🎯</div>
+        <div class="challenge-content">
+          <div class="challenge-label">Your Challenge For Today</div>
+          <div class="challenge-text green">Before you trust any AI output today — ask yourself one question: "Have I verified this, or does it just sound right?" That habit, built consistently, is worth more than any technical safeguard.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- GO DEEPER -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-blue">🔵</div>
+        <div class="section-title-block">
+          <div class="section-label">For technical users — implementation and architecture focused</div>
+          <div class="section-title blue">Go Deeper</div>
+        </div>
+      </div>
+
+      <div class="section-meta">
+        <div class="meta-item"><div class="meta-dot"></div>Familiarity with prompt engineering helpful</div>
+        <div class="meta-item"><div class="meta-dot"></div>30 minutes</div>
+        <div class="meta-item"><div class="meta-dot"></div>Hallucination-resistant workflow techniques</div>
+      </div>
+
+      <!-- Why it happens -->
+      <div class="arch-block">
+        <div class="arch-title">Why Hallucination Happens — Three Root Causes</div>
+        <div class="arch-step">
+          <div class="arch-step-num">1</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">No Internal Fact-Checker</div>
+            <div class="arch-step-desc">LLMs predict the next token based on statistical patterns. They have no mechanism to verify whether a generated statement is factually accurate before producing it.</div>
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">2</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Training Data Edges</div>
+            <div class="arch-step-desc">When a query falls outside reliable training data — obscure facts, recent events, niche topics — the model generates the most statistically plausible continuation rather than admitting uncertainty.</div>
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">3</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Context Window Compression</div>
+            <div class="arch-step-desc">In long conversations, earlier context gets compressed or dropped. The model may generate responses inconsistent with information provided earlier — without flagging the inconsistency.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise 1 -->
+      <div class="exercise">
+        <div class="exercise-header blue">
+          <div class="exercise-number">EXERCISE 01</div>
+          <div class="exercise-title">Build a Hallucination-Resistant Prompt</div>
+        </div>
+        <div class="exercise-body">
+          <p>Compare these two approaches to the same query:</p>
+          <div class="prompt-box">
+            <div class="prompt-label">Standard prompt — hallucination-prone</div>
+            <div class="prompt-text">"What are the key findings from recent research on RAG accuracy in enterprise deployments?"</div>
+          </div>
+          <div class="prompt-box">
+            <div class="prompt-label">Hallucination-resistant version</div>
+            <div class="prompt-text">"I want to understand recent research on RAG accuracy in enterprise deployments. Before you answer: if you are uncertain about any specific claim, statistic, or citation, please flag it explicitly with [UNCERTAIN]. If you don't have reliable information on something, say so rather than estimating. Now — what do you know about this topic with confidence?"</div>
+          </div>
+          <div class="notice"><strong>What to notice:</strong> The second prompt activates a different response pattern. AI is more likely to flag uncertainty when explicitly instructed to. This doesn't eliminate hallucination but significantly reduces confident fabrication.</div>
+        </div>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="exercise">
+        <div class="exercise-header blue">
+          <div class="exercise-number">EXERCISE 02</div>
+          <div class="exercise-title">Ask AI to Audit Its Own Output</div>
+        </div>
+        <div class="exercise-body">
+          <p>After any AI response that contains specific facts, statistics, or citations, follow up with:</p>
+          <div class="prompt-box">
+            <div class="prompt-label">Copy · Paste · Run after any AI response</div>
+            <div class="prompt-text">"For each specific claim you just made, tell me: are you certain this is accurate, uncertain but plausible, or are you inferring? Flag each one explicitly."</div>
+          </div>
+          <div class="notice"><strong>What to notice:</strong> This forces AI to audit its own output. You will often find it flags several claims as uncertain that it previously delivered with complete confidence. This is one of the most practical hallucination checks available without external tools.</div>
+        </div>
+      </div>
+
+      <!-- Exercise 3 -->
+      <div class="exercise">
+        <div class="exercise-header blue">
+          <div class="exercise-number">EXERCISE 03</div>
+          <div class="exercise-title">Build a Verification Layer Into Your Workflow</div>
+        </div>
+        <div class="exercise-body">
+          <p>For any AI workflow where accuracy matters, add this as a standard closing step:</p>
+          <div class="prompt-box">
+            <div class="prompt-label">Standard verification prompt — use after any important output</div>
+            <div class="prompt-text">"Before I use this output — review everything you just told me. Identify any claims that: (1) rely on specific facts you may not have reliably in your training data, (2) include dates, names, statistics, or citations, (3) you generated by inference rather than direct knowledge. List them and flag your confidence level for each."</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise 4 -->
+      <div class="exercise">
+        <div class="exercise-header blue">
+          <div class="exercise-number">EXERCISE 04</div>
+          <div class="exercise-title">Map Your Hallucination Risk Surface</div>
+        </div>
+        <div class="exercise-body">
+          <p>For teams building AI into workflows, use this prompt to identify where hallucination risk is highest:</p>
+          <div class="prompt-box">
+            <div class="prompt-label">Copy · Paste · Fill in the brackets</div>
+            <div class="prompt-text">"I am building an AI workflow for <span class="placeholder">[describe your use case]</span>. Help me identify: (1) which parts of this workflow are most vulnerable to hallucination, (2) what verification steps I should add at each vulnerable point, (3) whether RAG would reduce hallucination risk for this use case and how, (4) what human review checkpoints I should build in before AI output reaches an end user."</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Challenge -->
+      <div class="challenge blue">
+        <div class="challenge-icon">🎯</div>
+        <div class="challenge-content">
+          <div class="challenge-label">Your Challenge For Today</div>
+          <div class="challenge-text blue">Audit one AI workflow you currently use. Apply the verification prompt from Exercise 3 to its last output. Document what AI flags as uncertain. The gap between what it delivered confidently and what it now flags as uncertain — that's your hallucination risk surface.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- PRIVACY -->
+    <div class="privacy">
+      <div class="privacy-icon">⚠️</div>
+      <div class="privacy-content">
+        <div class="privacy-title">A Note on Privacy and Security</div>
+        <ul class="privacy-list">
+          <li><strong>Use dummy data for all exercises.</strong> Never paste sensitive personal or organizational data into a public AI tool to test its behavior.</li>
+          <li><strong>The exercises above</strong> are designed to work entirely with fabricated test data — no real information needed.</li>
+          <li><strong>When testing hallucination in production workflows,</strong> use a sandboxed environment with anonymized data before drawing any conclusions about live systems.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="resources">
+      <div class="resources-title">Resources Worth Exploring</div>
+      <ul class="resource-list">
+        <li>Search "LLM hallucination benchmarks" for current research on hallucination rates across models</li>
+        <li>Day 3 toolkit — RAG reduces hallucination risk by grounding AI responses in your verified knowledge base</li>
+        <li>Your AI tool's documentation on system prompts — where hallucination-resistant instructions can be set permanently</li>
+        <li>Search "Constitutional AI" and "RLHF" for how model training approaches attempt to reduce hallucination</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 04 OF 30 · MORE TOOLKITS ADDED DAILY</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+</body>
+</html>
