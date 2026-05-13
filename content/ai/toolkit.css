@@ -837,3 +837,378 @@ img { display: block; max-width: 100%; }
   .coming-actions .btn-primary,
   .coming-actions .btn-secondary { text-align: center; width: 100%; }
 }
+
+
+/* ============================================================
+   PHASE STRUCTURE — Day 7 and human-centered toolkits
+   Before / During / After phase layout with interactive elements
+   ============================================================ */
+
+/* ── PHASE CONTAINER ── */
+.phase {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.phase-header {
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+
+.phase-header.before { background: #F0FDF8; border-bottom-color: rgba(26,127,90,0.15); }
+.phase-header.during { background: #EDE9FA; border-bottom-color: rgba(91,63,191,0.15); }
+.phase-header.after  { background: #E6EEFA; border-bottom-color: rgba(26,79,159,0.15); }
+
+/* ── PHASE CHECKBOX ── */
+.phase-checkbox {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  border: 2px solid var(--border-strong);
+  background: white;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: transparent;
+}
+
+.phase-checkbox.checked {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+.phase-header.before .phase-checkbox:hover { border-color: var(--green); }
+.phase-header.during .phase-checkbox:hover { border-color: var(--accent); }
+.phase-header.after  .phase-checkbox:hover { border-color: var(--blue); }
+
+/* ── PHASE TITLE BLOCK ── */
+.phase-title-block { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+
+.phase-timing {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.phase-header.before .phase-timing { color: var(--green); }
+.phase-header.during .phase-timing { color: var(--accent); }
+.phase-header.after  .phase-timing { color: var(--blue); }
+
+.phase-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(16px, 2vw, 20px);
+  letter-spacing: -0.3px;
+}
+
+.phase-header.before .phase-title { color: var(--green); }
+.phase-header.during .phase-title { color: var(--accent); }
+.phase-header.after  .phase-title { color: var(--blue); }
+
+.phase-subtitle {
+  font-size: clamp(12px, 1.3vw, 14px);
+  font-weight: 300;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.phase-body {
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── REFLECTION QUESTIONS ── */
+.reflection-question {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  border-left: 3px solid var(--border-strong);
+}
+
+.reflection-question.before { border-left-color: var(--green); }
+.reflection-question.during { border-left-color: var(--accent); }
+.reflection-question.after  { border-left-color: var(--blue); }
+
+.question-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+.question-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.5vw, 16px);
+  color: var(--text);
+  letter-spacing: -0.2px;
+  line-height: 1.4;
+}
+
+.question-subtext {
+  font-size: clamp(12px, 1.3vw, 14px);
+  font-weight: 300;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* ── SCORE DIMENSIONS ── */
+.score-dimension {
+  background: var(--surface-alt);
+  border-radius: 8px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.score-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.5vw, 15px);
+  color: var(--text);
+}
+
+.score-anchors { display: flex; flex-direction: column; gap: 4px; }
+
+.score-anchor {
+  font-size: clamp(11px, 1.2vw, 13px);
+  color: var(--text-muted);
+  font-weight: 300;
+  line-height: 1.5;
+  padding-left: 24px;
+  position: relative;
+}
+
+.score-anchor::before {
+  position: absolute;
+  left: 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+}
+
+.score-anchor.low::before  { content: '1 —'; color: var(--red); }
+.score-anchor.high::before { content: '5 —'; color: var(--green); }
+
+.score-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.score-input-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.score-boxes { display: flex; gap: 6px; }
+
+.score-box {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.score-box:hover { border-color: var(--accent); color: var(--accent); }
+.score-box.selected { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* ── OUTPUT BOX ── */
+.output-box {
+  background: white;
+  border: 1px dashed var(--border-strong);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.output-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+
+.output-prompt {
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--text);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.output-prompt span {
+  display: inline-block;
+  min-width: 200px;
+  border-bottom: 1px solid var(--border-strong);
+  margin: 0 4px;
+}
+
+/* ── COMMITMENT BLOCKS ── */
+.commitment {
+  background: var(--blue-light);
+  border: 1px solid rgba(26,79,159,0.2);
+  border-radius: 8px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commitment-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.commitment-text {
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.commitment-text span {
+  display: inline-block;
+  min-width: 180px;
+  border-bottom: 1px solid rgba(26,79,159,0.3);
+  margin: 0 4px;
+}
+
+/* ── OUTCOMES BOX ── */
+.outcomes-box {
+  background: var(--surface-alt);
+  border-radius: 10px;
+  padding: 24px 28px;
+  border-left: 3px solid var(--accent);
+}
+
+.outcomes-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.5vw, 16px);
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.outcomes-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+.outcomes-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.outcomes-list li::before {
+  content: '✓';
+  color: var(--green);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── FINAL NOTE ── */
+.final-note {
+  background: var(--surface-alt);
+  border-radius: 10px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.final-note-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.5vw, 16px);
+  color: var(--text);
+}
+
+.final-note p {
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--text-muted);
+  line-height: 1.75;
+  font-weight: 300;
+}
+
+.final-note p + p { margin-top: 8px; }
+
+/* ── PROGRESS TRACKER ── */
+.progress-tracker {
+  background: var(--green-light);
+  border: 1px solid rgba(26,127,90,0.2);
+  border-radius: 10px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tracker-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.tracker-time {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(20px, 2.5vw, 26px);
+  color: var(--green);
+  letter-spacing: -0.5px;
+}
+
+.tracker-desc {
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: var(--green);
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+/* ── RESPONSIVE ADDITIONS ── */
+@media (max-width: 560px) {
+  .score-boxes { flex-wrap: wrap; }
+  .phase-body { padding: 20px 16px; }
+}
