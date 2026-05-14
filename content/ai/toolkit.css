@@ -1212,3 +1212,166 @@ img { display: block; max-width: 100%; }
   .score-boxes { flex-wrap: wrap; }
   .phase-body { padding: 20px 16px; }
 }
+
+
+/* ============================================================
+   EXPERIMENT TEMPLATE — Day 8 and task-design toolkits
+   Centaur experiment fields, handoff blocks, question blocks
+   ============================================================ */
+
+/* ── EXPERIMENT FIELDS ── */
+.experiment-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.field-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.5vw, 16px);
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.field-example {
+  font-size: clamp(11px, 1.2vw, 13px);
+  color: var(--text-light);
+  font-style: italic;
+  line-height: 1.5;
+  padding: 8px 12px;
+  background: var(--surface-alt);
+  border-radius: 6px;
+  border-left: 2px solid var(--border-strong);
+}
+
+.field-example strong { color: var(--text-muted); font-style: normal; }
+
+.field-input {
+  min-height: 52px;
+  background: var(--bg);
+  border: 1px dashed var(--border-strong);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.6;
+  cursor: text;
+}
+
+.field-desc {
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: var(--text-muted);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* ── HANDOFF BLOCKS ── */
+.handoff-list { display: flex; flex-direction: column; gap: 12px; }
+
+.handoff-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 20px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+}
+
+.handoff-item.green { border-left-color: var(--green); }
+.handoff-item.blue  { border-left-color: var(--blue); }
+.handoff-item.amber { border-left-color: var(--amber); }
+
+.handoff-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: white;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.handoff-num.green { background: var(--green); }
+.handoff-num.blue  { background: var(--blue); }
+.handoff-num.amber { background: var(--amber); }
+
+.handoff-content { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+.handoff-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(13px, 1.4vw, 14px);
+  color: var(--text);
+}
+
+.handoff-input {
+  min-height: 40px;
+  background: white;
+  border: 1px dashed var(--border-strong);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: var(--text-muted);
+  font-style: italic;
+  cursor: text;
+}
+
+/* ── QUESTION BLOCKS ── */
+.question-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px;
+  background: var(--surface-alt);
+  border-radius: 10px;
+  border-left: 3px solid var(--blue);
+}
+
+.question-block-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.question-block-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.5vw, 16px);
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.question-block-desc {
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: var(--text-muted);
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+.question-block-input {
+  min-height: 52px;
+  background: white;
+  border: 1px dashed var(--border-strong);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: var(--text-muted);
+  font-style: italic;
+  cursor: text;
+}
