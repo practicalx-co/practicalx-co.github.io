@@ -1252,18 +1252,23 @@ img { display: block; max-width: 100%; }
 .field-example strong { color: var(--text-muted); font-style: normal; }
 
 .field-input {
-  min-height: 52px;
+  min-height: 80px;
   background: var(--bg);
   border: 1px dashed var(--border-strong);
   border-radius: 6px;
   padding: 12px 14px;
   font-family: 'DM Sans', sans-serif;
   font-size: clamp(13px, 1.4vw, 15px);
-  color: var(--text-muted);
-  font-style: italic;
+  color: var(--text);
   line-height: 1.6;
-  cursor: text;
+  width: 100%;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
 }
+
+.field-input::placeholder { color: var(--text-muted); font-style: italic; }
+.field-input:focus { border-color: var(--accent); border-style: solid; }
 
 .field-desc {
   font-size: clamp(12px, 1.3vw, 14px);
@@ -1317,17 +1322,22 @@ img { display: block; max-width: 100%; }
 }
 
 .handoff-input {
-  min-height: 40px;
+  min-height: 56px;
   background: white;
   border: 1px dashed var(--border-strong);
   border-radius: 6px;
   padding: 10px 12px;
   font-family: 'DM Sans', sans-serif;
   font-size: clamp(12px, 1.3vw, 14px);
-  color: var(--text-muted);
-  font-style: italic;
-  cursor: text;
+  color: var(--text);
+  width: 100%;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
 }
+
+.handoff-input::placeholder { color: var(--text-muted); font-style: italic; }
+.handoff-input:focus { border-color: var(--accent); border-style: solid; }
 
 /* ── QUESTION BLOCKS ── */
 .question-block {
@@ -1364,14 +1374,34 @@ img { display: block; max-width: 100%; }
 }
 
 .question-block-input {
-  min-height: 52px;
+  min-height: 80px;
   background: white;
   border: 1px dashed var(--border-strong);
   border-radius: 6px;
   padding: 12px 14px;
   font-family: 'DM Sans', sans-serif;
   font-size: clamp(12px, 1.3vw, 14px);
-  color: var(--text-muted);
-  font-style: italic;
-  cursor: text;
+  color: var(--text);
+  width: 100%;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.question-block-input::placeholder { color: var(--text-muted); font-style: italic; }
+.question-block-input:focus { border-color: var(--accent); border-style: solid; }
+
+
+/* ── TEXTAREA PRINT STYLES ── */
+@media print {
+  textarea.field-input,
+  textarea.handoff-input,
+  textarea.question-block-input {
+    border: 1px solid var(--border-strong) !important;
+    border-style: solid !important;
+    background: white !important;
+    color: var(--text) !important;
+    resize: none !important;
+    min-height: 60px !important;
+  }
 }
