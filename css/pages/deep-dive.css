@@ -1,0 +1,780 @@
+/* ============================================================
+   PRACTICALX — DEEP DIVE READING STYLES
+   Kindle-inspired warm reading experience for long form content.
+   All deep dive pages reference this file.
+   ============================================================ */
+
+/* ── DEEP DIVE TOKENS ── */
+:root {
+  --dd-bg:              #F5F0E8;
+  --dd-surface:         #FAF7F2;
+  --dd-surface-2:       #F0EAE0;
+  --dd-text:            #2C2416;
+  --dd-text-muted:      #6B5F4E;
+  --dd-text-light:      #A89880;
+  --dd-accent:          #8B6914;
+  --dd-accent-hover:    #C8860A;
+  --dd-accent-dim:      rgba(139,105,20,0.12);
+  --dd-border:          #E8E0D0;
+  --dd-border-strong:   #D4C8B0;
+  --dd-pullquote-bg:    #EDE8DC;
+  --dd-progress:        #7B5CFA;
+  --dd-nav-bg:          rgba(245,240,232,0.92);
+  --dd-max-width:       680px;
+  --dd-wide-width:      860px;
+}
+
+/* ── RESET FOR DEEP DIVE ── */
+.deep-dive-page {
+  background: var(--dd-bg);
+  color: var(--dd-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(16px, 1.8vw, 19px);
+  line-height: 1.85;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── READING PROGRESS BAR ── */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: var(--dd-progress);
+  z-index: 200;
+  transition: width 0.1s linear;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── STICKY NAV ── */
+.dd-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 60px;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--dd-nav-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--dd-border);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.dd-nav.visible { transform: translateY(3px); }
+
+.dd-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.dd-nav-mark {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #7B5CFA, #00D4EE);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 10px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.dd-nav-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--dd-text);
+}
+
+.dd-nav-title {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--dd-text-muted);
+  text-align: center;
+  flex: 1;
+  padding: 0 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dd-nav-cta {
+  background: var(--dd-accent);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dd-nav-cta:hover { background: var(--dd-accent-hover); color: white; }
+
+/* ── HERO ── */
+.dd-hero {
+  padding: 80px 40px 60px;
+  max-width: var(--dd-wide-width);
+  margin: 0 auto;
+  border-bottom: 1px solid var(--dd-border);
+}
+
+.dd-series-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--dd-accent-dim);
+  border: 1px solid rgba(139,105,20,0.2);
+  border-radius: 100px;
+  padding: 5px 14px;
+  margin-bottom: 24px;
+}
+
+.dd-series-tag-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--dd-accent);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.dd-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(28px, 4.5vw, 52px);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  color: var(--dd-text);
+  margin-bottom: 12px;
+}
+
+.dd-subtitle {
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 300;
+  color: var(--dd-text-muted);
+  line-height: 1.5;
+  margin-bottom: 32px;
+  max-width: 580px;
+}
+
+/* ── AUTHOR META ── */
+.dd-author-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 0;
+  border-top: 1px solid var(--dd-border);
+  border-bottom: 1px solid var(--dd-border);
+}
+
+.dd-author-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7B5CFA, #00D4EE);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.dd-author-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+
+.dd-author-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--dd-text);
+}
+
+.dd-author-role {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--dd-text-muted);
+}
+
+.dd-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.dd-meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.dd-meta-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--dd-text-light);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.dd-meta-value {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dd-text-muted);
+}
+
+.dd-meta-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--dd-border-strong);
+}
+
+/* ── TAGS ── */
+.dd-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.dd-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--dd-text-muted);
+  background: var(--dd-surface-2);
+  border: 1px solid var(--dd-border);
+  border-radius: 100px;
+  padding: 3px 10px;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.dd-tag:hover { border-color: var(--dd-accent); color: var(--dd-accent); }
+
+/* ── ARTICLE BODY ── */
+.dd-body {
+  max-width: var(--dd-max-width);
+  margin: 0 auto;
+  padding: 56px 40px 80px;
+}
+
+/* ── TYPOGRAPHY ── */
+.dd-body p {
+  font-size: clamp(16px, 1.8vw, 19px);
+  line-height: 1.85;
+  font-weight: 300;
+  color: var(--dd-text);
+  margin-bottom: 24px;
+}
+
+.dd-body p:last-child { margin-bottom: 0; }
+
+/* Drop cap on first paragraph */
+.dd-body .drop-cap::first-letter {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 4.5em;
+  line-height: 0.75;
+  float: left;
+  margin: 6px 10px 0 0;
+  color: var(--dd-accent);
+}
+
+/* ── SECTION HEADERS ── */
+.dd-section {
+  margin: 56px 0 32px;
+}
+
+.dd-section-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--dd-text-light);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.dd-section-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(20px, 2.5vw, 28px);
+  color: var(--dd-text);
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+  margin-bottom: 0;
+}
+
+.dd-section-divider {
+  height: 2px;
+  background: linear-gradient(90deg, var(--dd-accent), transparent);
+  margin-bottom: 28px;
+  border: none;
+}
+
+/* ── PULL QUOTE ── */
+.dd-pullquote {
+  background: var(--dd-pullquote-bg);
+  border-left: 4px solid var(--dd-accent);
+  border-radius: 0 8px 8px 0;
+  padding: 24px 28px;
+  margin: 40px 0;
+}
+
+.dd-pullquote-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 24px);
+  color: var(--dd-text);
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  font-style: italic;
+}
+
+/* ── TOOL CARD ── */
+.dd-tool-card {
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dd-tool-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--dd-border);
+}
+
+.dd-tool-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--dd-accent-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.dd-tool-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(15px, 1.8vw, 18px);
+  color: var(--dd-text);
+  letter-spacing: -0.3px;
+}
+
+.dd-tool-tagline {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--dd-text-muted);
+  font-style: italic;
+}
+
+.dd-tool-desc {
+  font-size: clamp(14px, 1.5vw, 16px);
+  color: var(--dd-text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.dd-tool-lesson {
+  background: var(--dd-surface-2);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--dd-text-muted);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.dd-tool-lesson strong {
+  color: var(--dd-accent);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ── SIGNAL LIST ── */
+.dd-signal-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 24px 0;
+}
+
+.dd-signal-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.dd-signal-icon {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--dd-accent-dim);
+  border: 1px solid rgba(139,105,20,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.dd-signal-content { display: flex; flex-direction: column; gap: 4px; }
+
+.dd-signal-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.5vw, 16px);
+  color: var(--dd-text);
+  letter-spacing: -0.2px;
+}
+
+.dd-signal-desc {
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--dd-text-muted);
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+/* ── CONVICTION BLOCK ── */
+.dd-conviction {
+  background: var(--dd-text);
+  border-radius: 12px;
+  padding: 36px 40px;
+  margin: 40px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.dd-conviction::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(123,92,250,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.dd-conviction p {
+  font-size: clamp(15px, 1.8vw, 18px);
+  color: rgba(255,255,255,0.85);
+  line-height: 1.75;
+  margin-bottom: 16px;
+  font-weight: 300;
+  position: relative;
+  z-index: 1;
+}
+
+.dd-conviction p:last-child { margin-bottom: 0; }
+
+.dd-conviction p strong {
+  color: white;
+  font-weight: 600;
+}
+
+.dd-conviction .conviction-quote {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(16px, 2vw, 20px);
+  color: white;
+  letter-spacing: -0.3px;
+  line-height: 1.4;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── JOURNEY SUMMARY ── */
+.dd-journey {
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin: 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dd-journey-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--dd-text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-family: 'DM Mono', monospace;
+}
+
+.dd-journey-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.dd-journey-arrow {
+  color: var(--dd-accent);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-weight: 700;
+}
+
+.dd-journey-content { display: flex; flex-direction: column; gap: 2px; }
+
+.dd-journey-tool {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--dd-text);
+}
+
+.dd-journey-reason {
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: var(--dd-text-muted);
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* ── AUTHOR BIO ── */
+.dd-author-bio {
+  background: var(--dd-surface-2);
+  border: 1px solid var(--dd-border);
+  border-radius: 12px;
+  padding: 32px 36px;
+  margin-top: 64px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.dd-bio-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7B5CFA, #00D4EE);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.dd-bio-content { display: flex; flex-direction: column; gap: 8px; }
+
+.dd-bio-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--dd-text-light);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.dd-bio-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(16px, 1.8vw, 20px);
+  color: var(--dd-text);
+  letter-spacing: -0.3px;
+}
+
+.dd-bio-role {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--dd-text-muted);
+  font-style: italic;
+}
+
+.dd-bio-text {
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--dd-text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+  margin-top: 4px;
+}
+
+.dd-bio-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.dd-bio-link {
+  background: var(--dd-accent);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.dd-bio-link:hover { background: var(--dd-accent-hover); color: white; }
+
+.dd-bio-link.outline {
+  background: transparent;
+  color: var(--dd-text-muted);
+  border: 1px solid var(--dd-border-strong);
+}
+
+.dd-bio-link.outline:hover { border-color: var(--dd-accent); color: var(--dd-accent); }
+
+/* ── SERIES NAVIGATION ── */
+.dd-series-nav {
+  display: flex;
+  gap: 16px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.dd-nav-card {
+  flex: 1;
+  min-width: 200px;
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dd-nav-card:hover { border-color: var(--dd-accent); transform: translateY(-2px); }
+
+.dd-nav-card-dir {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--dd-text-light);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.dd-nav-card-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--dd-text);
+  line-height: 1.3;
+}
+
+/* ── FOOTER ── */
+.dd-footer {
+  background: var(--dd-text);
+  padding: 32px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.dd-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.dd-footer-mark {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #7B5CFA, #00D4EE);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 10px;
+  color: var(--dd-bg);
+}
+
+.dd-footer-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+}
+
+.dd-footer-name span { color: #00D4EE; }
+
+.dd-footer-tagline {
+  font-size: 11px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.4);
+  font-style: italic;
+}
+
+.dd-footer-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.dd-footer-link {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.dd-footer-link:hover { color: #00D4EE; }
+
+.dd-footer-copy {
+  width: 100%;
+  padding-top: 20px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .dd-nav { padding: 0 20px; }
+  .dd-nav-title { display: none; }
+  .dd-hero { padding: 70px 24px 40px; }
+  .dd-body { padding: 40px 24px 60px; }
+  .dd-author-bio { flex-direction: column; padding: 24px; }
+  .dd-meta-right { display: none; }
+  .dd-footer { padding: 24px; flex-direction: column; align-items: flex-start; }
+  .dd-conviction { padding: 24px; }
+  .dd-tool-card { padding: 20px; }
+}

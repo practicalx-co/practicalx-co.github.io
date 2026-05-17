@@ -1,0 +1,21 @@
+{
+  "author": {
+    "name": "Karthik Mahadevan",
+    "role": "CIO · Building PracticalX",
+    "tagline": "Still learning. Always building.",
+    "linkedin": "https://www.linkedin.com/in/karthikmahadevan06/",
+    "avatar": "/assets/images/xe-mark.svg"
+  },
+  "site": {
+    "name": "PracticalX",
+    "tagline": "Practical mastery over theoretical knowledge.",
+    "url": "https://www.practicalx.co",
+    "series": "Learning AI Out Loud",
+    "seriesUrl": "/content/ai/",
+    "deepDivesUrl": "/deep-dives/"
+  },
+  "social": {
+    "linkedin": "https://www.linkedin.com/in/karthikmahadevan06/",
+    "knowledgeHub": "https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c"
+  }
+}
