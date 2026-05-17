@@ -778,3 +778,243 @@
   .dd-conviction { padding: 24px; }
   .dd-tool-card { padding: 20px; }
 }
+
+
+/* ============================================================
+   DEEP DIVE DAY 12 — Financial Journey Components
+   Cost table, stage cards, economics questions, principles
+   ============================================================ */
+
+/* ── COST TABLE ── */
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: clamp(13px, 1.4vw, 15px);
+  background: var(--dd-surface);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--dd-border);
+}
+
+.cost-table th {
+  background: var(--dd-text);
+  color: white;
+  padding: 12px 20px;
+  text-align: left;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(12px, 1.3vw, 14px);
+  letter-spacing: 0.3px;
+}
+
+.cost-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--dd-border);
+  color: var(--dd-text-muted);
+  font-weight: 300;
+}
+
+.cost-table tr:last-child td {
+  border-bottom: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  color: var(--dd-text);
+  background: var(--dd-surface-2);
+}
+
+.cost-table tr:hover td { background: var(--dd-surface-2); }
+
+/* ── STAGE CARDS ── */
+.stage-card {
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stage-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--dd-accent);
+}
+
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stage-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--dd-text-light);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: var(--dd-surface-2);
+  padding: 3px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.stage-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(15px, 1.8vw, 18px);
+  color: var(--dd-text);
+  letter-spacing: -0.3px;
+}
+
+.stage-cost {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--dd-accent);
+  font-weight: 500;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.stage-desc {
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--dd-text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.stage-insight {
+  background: var(--dd-surface-2);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: var(--dd-text-muted);
+  font-style: italic;
+  line-height: 1.6;
+  border-left: 2px solid var(--dd-accent);
+}
+
+.stage-insight strong { color: var(--dd-accent); font-style: normal; font-weight: 600; }
+
+/* ── ECONOMICS QUESTIONS ── */
+.economics-question {
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin: 16px 0;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.eq-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--dd-accent);
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.eq-content { display: flex; flex-direction: column; gap: 6px; }
+
+.eq-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 1.5vw, 16px);
+  color: var(--dd-text);
+  letter-spacing: -0.2px;
+}
+
+.eq-desc {
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--dd-text-muted);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ── FREE VS PAID LIST ── */
+.fvp-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+
+.fvp-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: var(--dd-text-muted);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+.fvp-item::before { content: '→'; color: var(--dd-accent); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.fvp-item strong { color: var(--dd-text); font-weight: 600; }
+
+/* ── PRINCIPLE LIST ── */
+.principle-list { list-style: none; display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+
+.principle-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 20px;
+  background: var(--dd-surface);
+  border: 1px solid var(--dd-border);
+  border-radius: 8px;
+}
+
+.principle-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+.principle-content { display: flex; flex-direction: column; gap: 4px; }
+.principle-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: clamp(13px, 1.4vw, 15px); color: var(--dd-text); }
+.principle-desc { font-size: clamp(12px, 1.3vw, 14px); color: var(--dd-text-muted); line-height: 1.65; font-weight: 300; }
+
+/* ── NOTE BOX ── */
+.dd-note {
+  background: #FFF8E6;
+  border: 1px solid #F5D87A;
+  border-radius: 10px;
+  padding: 18px 22px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 24px 0;
+}
+
+.dd-note-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+.dd-note-text { font-size: clamp(12px, 1.3vw, 14px); color: #5C4000; line-height: 1.65; font-weight: 300; }
+.dd-note-text strong { color: #7A5500; font-weight: 600; }
+
+/* ── COPILOT NOTE ── */
+.copilot-note {
+  background: var(--dd-surface-2);
+  border: 1px solid var(--dd-border-strong);
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin: 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.copilot-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--dd-text-light); letter-spacing: 2px; text-transform: uppercase; }
+.copilot-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: clamp(14px, 1.5vw, 16px); color: var(--dd-text); }
+.copilot-desc { font-size: clamp(13px, 1.4vw, 15px); color: var(--dd-text-muted); line-height: 1.7; font-weight: 300; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 560px) {
+  .stage-cost { display: none; }
+  .cost-table { font-size: 13px; }
+  .cost-table td, .cost-table th { padding: 10px 14px; }
+}
