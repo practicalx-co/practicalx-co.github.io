@@ -8,7 +8,7 @@
   'use strict';
 
   // ── UPDATE THIS DAILY ──
-  const SERIES_CURRENT_DAY = 11;
+  const SERIES_CURRENT_DAY = 13;
   const SERIES_TOTAL_DAYS  = 30;
 
   // ── CALCULATE PERCENTAGE ──

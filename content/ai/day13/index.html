@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 13 · The Flashlight Problem</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+</head>
+<body>
+
+<!-- BACK NAV -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 13 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">The Flashlight<br>Problem</div>
+    <div class="header-quote">AI doesn't create security risk. It illuminates the risk you chose to live with.</div>
+    <div class="header-arc">Arc 3 · AI and Security — Day 1 of 6 · Days 13–18</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p><strong>What this toolkit is:</strong> The opening entry in Arc 3 — AI and Security. Not a technical deep-dive, but the leadership framing every CIO and technology leader needs before deploying AI agents into an environment with existing security debt. Three sections. One clear first move.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      Arc 2 covered the people problem — resistance, culture, strategy ownership. Day 12 ended with the financial case for investing now rather than waiting. Arc 3 starts with the reason speed without preparation is dangerous: AI agents don't operate in isolation. They operate inside your environment. And your environment already has cracks in it.
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-purple">💡</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 1 of 3</div>
+          <div class="section-title">The Threat Model Has Shifted</div>
+        </div>
+      </div>
+      <div class="core-idea">
+        <p>Most security conversations about AI focus on the AI tool itself — the model, the vendor, the data policy. That is the wrong place to look first. The more important question is what the AI tool can reach. An agent with access to your internal systems, APIs, and credentials doesn't introduce new attack surface. It inherits yours.</p>
+        <div class="pullquote">The attack surface isn't the AI tool. It's everything the AI tool can touch.</div>
+      </div>
+
+      <div class="arch-block">
+        <div class="arch-title">Three shifts that change the calculus</div>
+        <div class="arch-step">
+          <div class="arch-step-num">1</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">AI agents operate with credentials, make API calls, and traverse networks</div>
+            <div class="arch-step-desc">Unlike a passive chatbot that generates text for a human to review, an agentic AI acts. It authenticates, reads, writes, calls services, and executes instructions — sometimes with the same access privileges as the engineer who deployed it. Every misconfiguration in your environment is now reachable by software that moves faster than any human operator.</div>
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">2</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Attacker use of AI is already outpacing defender adoption</div>
+            <div class="arch-step-desc">Attackers have no procurement process, no change management, no compliance review. They adopted AI for reconnaissance, phishing, and vulnerability scanning the moment the tools became capable enough. The asymmetry is real: defenders move slowly by design; attackers move as fast as the technology allows. The gap is already open.</div>
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num">3</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">The flashlight effect</div>
+            <div class="arch-step-desc">AI doesn't create the vulnerabilities — it finds them faster than anyone has before. Overpermissioned service accounts, forgotten API keys, undocumented integrations — these existed before any AI agent touched your environment. AI is the flashlight. The mess was already there. The question is whether you find it first, or whether someone else does.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 2 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-amber">🔍</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 2 of 3</div>
+          <div class="section-title" style="color:var(--amber);">The Three Cracks AI Will Find First</div>
+        </div>
+      </div>
+      <div class="core-idea">
+        <p>You don't need to anticipate every attack vector. You need to close the three that are most likely to be exploited when an AI agent starts operating inside your environment. These aren't theoretical — they're the patterns that show up in incident reports, post-mortems, and red team findings across almost every organisation that has started this conversation too late.</p>
+      </div>
+
+      <div class="arch-block">
+        <div class="arch-title">Where the cracks are</div>
+        <div class="arch-step">
+          <div class="arch-step-num" style="background:var(--amber);">1</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Overpermissioned identities — human and non-human</div>
+            <div class="arch-step-desc">Service accounts accumulate permissions over time. A script written three years ago was given broad access to get something working — and that access was never reviewed again. Human accounts that changed roles still carry permissions from their previous responsibilities. When an AI agent authenticates with any of these identities, it inherits everything those identities can do. The blast radius of a compromised agent scales directly with how permissioned the identity it operates under happens to be.</div>
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num" style="background:var(--amber);">2</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Undocumented integrations and shadow IT</div>
+            <div class="arch-step-desc">Every organisation has integrations nobody planned for — a spreadsheet pulling from an API, a workflow tool connected to the CRM, a third-party service that one team quietly adopted two years ago. These connections are rarely governed, rarely reviewed, and often forgotten. An AI agent traversing your environment will find them. So will an attacker who compromises the agent. The risk is not just what you deployed — it's what you didn't document.</div>
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num" style="background:var(--amber);">3</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Stale credentials and forgotten API keys</div>
+            <div class="arch-step-desc">API keys in environment variables, credentials committed to repositories years ago, tokens in config files that were never rotated — this is the most consistent finding in security audits. These keys often have broad permissions because they were created when least-privilege wasn't a cultural priority. They're also the easiest attack path for any automated system — human or AI — that gains a foothold in your environment.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="challenge" style="background:var(--amber-light);border:1px solid rgba(180,90,0,0.2);">
+        <div class="challenge-icon">⚠️</div>
+        <div class="challenge-content">
+          <div class="challenge-label">The honest question</div>
+          <div class="challenge-text" style="color:var(--amber);font-weight:500;">If a well-resourced attacker had read access to everything your AI agent can reach today — what would they find? Most technology leaders can't answer this question with confidence. That gap is the work Arc 3 is designed to start.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 3 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-blue">🔵</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 3 of 3</div>
+          <div class="section-title blue">The CIO's First Move</div>
+        </div>
+      </div>
+      <div class="core-idea">
+        <p>This isn't about stopping AI adoption — the business case for moving is strong and the case for waiting gets weaker every quarter. This is about ensuring that when your first AI agent starts operating in production, it does so inside an environment that has been prepared to receive it. Three moves. In order. Before you deploy.</p>
+      </div>
+
+      <div class="arch-block">
+        <div class="arch-title">Three moves before you deploy an AI agent</div>
+        <div class="arch-step">
+          <div class="arch-step-num" style="background:var(--blue);">1</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Run a permissions audit on every service account the agent will use</div>
+            <div class="arch-step-desc">Before deploying AI agents, audit every service account in scope. Strip permissions to the minimum required for the agent's intended task. If the agent needs to read from one database table, it should not have write access to the database, access to adjacent systems, or permissions inherited from a broader service account. This is not a one-time activity — it's the beginning of a discipline around non-human identity management that AI makes non-negotiable.</div>
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num" style="background:var(--blue);">2</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Map what your AI can reach — treat it like an insider threat scope exercise</div>
+            <div class="arch-step-desc">Run the same mental model you would use for an insider threat exercise: if a malicious or compromised employee had the same access as your AI agent, what could they reach, read, modify, or exfiltrate? Document it. Make it visible to your security leadership. The exercise consistently surfaces integrations and access paths that nobody in the organisation knew still existed. That discovery is the point.</div>
+          </div>
+        </div>
+        <div class="arch-step">
+          <div class="arch-step-num" style="background:var(--blue);">3</div>
+          <div class="arch-step-content">
+            <div class="arch-step-title">Define a blast radius policy before you need it</div>
+            <div class="arch-step-desc">Before the agent goes live, answer one question in writing: what is the maximum damage this agent can cause if it is fully compromised? That answer defines your blast radius. Your deployment architecture, access controls, and monitoring strategy should all be calibrated against it. If the blast radius is unacceptably large, reduce the agent's access scope until it is not. Do this before deployment — not after an incident makes the conversation unavoidable.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice">
+        <strong>These three moves are sequenced deliberately.</strong> The permissions audit tells you what access exists. The scope mapping tells you what that access can reach. The blast radius policy tells you whether the risk is acceptable. Each step informs the next. Skipping to deployment without them is not moving fast — it's deferring the cost.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CLOSING -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-purple">📌</div>
+        <div class="section-title-block">
+          <div class="section-label">Where Arc 3 Goes From Here</div>
+          <div class="section-title">The Part Nobody Wants to Talk About</div>
+        </div>
+      </div>
+      <div class="core-idea">
+        <p>The next five days in Arc 3 get progressively more specific: from the data exposure implications of AI agents, to shadow AI already operating in your organisation, to the architectural patterns that make AI systems defensible by design. Today's toolkit is the framing. The rest of the arc is the detail.</p>
+        <div class="pullquote">Security debt was always expensive. AI just moved up the due date.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- PRIVACY -->
+    <div class="privacy">
+      <div class="privacy-icon">⚠️</div>
+      <div class="privacy-content">
+        <div class="privacy-title">A Note on Using This Toolkit</div>
+        <ul class="privacy-list">
+          <li><strong>The insider threat exercise in Section 3</strong> is a thought exercise for security planning — not a penetration test. Conduct actual technical assessments through your security team or a qualified third party.</li>
+          <li><strong>If the permissions audit or scope mapping surfaces a live vulnerability</strong>, treat it as a security finding and escalate through your standard incident or risk process immediately.</li>
+          <li><strong>The blast radius policy document</strong> will likely be sensitive — store and share it according to your organisation's information classification standards.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="resources">
+      <div class="resources-title">Resources Worth Exploring</div>
+      <ul class="resource-list">
+        <li>Search "OWASP LLM Top 10" — the definitive reference list for AI-specific security risks, maintained and updated as the threat landscape evolves</li>
+        <li>Search "non-human identity security" — a fast-growing discipline covering service accounts, API keys, and machine identities; directly relevant to AI agent deployments</li>
+        <li>Search "least privilege principle cloud" — the foundational access control concept that makes blast radius containment possible in practice</li>
+        <li>Day 14 — Your Data Is the Moat: what happens to your data when AI agents can reach it, and why data governance is now a security conversation</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section no-print">
+    <div class="progress-header">
+      <div class="progress-label">Series Progress</div>
+      <div class="progress-count">Day 13 / 30</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 43%"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 13 OF 30 · ARC 3 · AI AND SECURITY</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+</body>
+</html>
