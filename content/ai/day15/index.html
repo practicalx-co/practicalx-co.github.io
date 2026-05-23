@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 15 · The AI Agent Launch Checklist</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+<style>
+  .checklist { display: flex; flex-direction: column; gap: 8px; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .check-item:hover { border-color: var(--border-strong); }
+
+  .check-item input[type="checkbox"] {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    accent-color: var(--green);
+    cursor: pointer;
+    margin-top: 3px;
+  }
+
+  .check-item span {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .check-item:has(input:checked) {
+    background: var(--green-light);
+    border-color: rgba(26,127,90,0.25);
+  }
+
+  .check-item:has(input:checked) span {
+    color: var(--green);
+    text-decoration: line-through;
+    text-decoration-color: rgba(26,127,90,0.4);
+  }
+
+  .checklist-group {
+    background: var(--surface-alt);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .checklist-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 2px;
+  }
+
+  .closing-callout {
+    background: var(--accent-light);
+    border: 1px solid rgba(91,63,191,0.15);
+    border-radius: 10px;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .closing-callout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .closing-callout p {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .closing-callout p + p { margin-top: 8px; }
+
+  .closing-callout a { color: var(--accent); font-weight: 500; }
+  .closing-callout a:hover { color: var(--accent2); }
+
+  @media print {
+    .check-item { break-inside: avoid; page-break-inside: avoid; }
+    .checklist-group { break-inside: avoid; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BACK NAV -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 15 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">The AI Agent<br>Launch Checklist</div>
+    <div class="header-quote">Enterprise maturity isn't about the right person being in the room. It's about the checklist that runs whether they are or not.</div>
+    <div class="header-arc">Arc 3 · AI and Security — Day 3 of 6 · Days 13–18</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p><strong>What this toolkit is:</strong> A practical pre-launch checklist for AI agent deployments — covering the four areas most commonly skipped. Tick each item before your agent goes live. Then keep the list somewhere it gets reviewed, not just signed off.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      Day 13 framed the threat model. Day 14 was a pause. Day 15 is the first practical output from Arc 3 — the checklist your team runs before anything goes live.
+    </div>
+
+    <!-- OPENING DISCLAIMER -->
+    <div class="disclaimer">
+      <div class="disclaimer-icon">⚠️</div>
+      <div class="disclaimer-content">
+        <div class="disclaimer-title">Before you start</div>
+        <div class="disclaimer-text">This is a starter kit, not an exhaustive security framework. It covers the most commonly overlooked basics. Use it as a first line of defence — not the last.</div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: ENVIRONMENT CHECK -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-green">🌿</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 1 of 4</div>
+          <div class="section-title green">Environment Check</div>
+        </div>
+      </div>
+
+      <div class="checklist-group">
+        <div class="checklist-group-title">Confirm before deployment</div>
+        <div class="checklist">
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Is this a clean, isolated environment with no legacy projects living in it?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Are there any files, folders, or repositories the agent can reach that weren't intentionally scoped?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Has sensitive data — HR files, financial documents, board materials — been explicitly excluded from agent access?</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 2: IDENTITY AND ACCESS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-amber">🔑</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 2 of 4</div>
+          <div class="section-title" style="color:var(--amber);">Identity and Access</div>
+        </div>
+      </div>
+
+      <div class="checklist-group">
+        <div class="checklist-group-title">Verify every credential in scope</div>
+        <div class="checklist">
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Does every API token and service account have a named human owner?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Is access scoped to the minimum required — nothing broader?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Do any tokens grant privileged access to systems outside the project scope?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Are there any orphaned credentials from previous projects still active in this environment?</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 3: BLAST RADIUS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-red">💥</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 3 of 4</div>
+          <div class="section-title" style="color:var(--red);">Blast Radius</div>
+        </div>
+      </div>
+
+      <div class="checklist-group">
+        <div class="checklist-group-title">Understand the worst case before it happens</div>
+        <div class="checklist">
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Can you map everything this agent can reach in under 10 minutes?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Have you defined the worst case scenario if this agent is manipulated?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Is that worst case acceptable — and has someone signed off on it?</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 4: DECOMMISSION PLAN -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-blue">📋</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 4 of 4</div>
+          <div class="section-title blue">Decommission Plan</div>
+        </div>
+      </div>
+
+      <div class="checklist-group">
+        <div class="checklist-group-title">Plan the end before you begin</div>
+        <div class="checklist">
+          <label class="check-item">
+            <input type="checkbox">
+            <span>When this project ends, who is responsible for revoking access?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Is there a date or trigger defined for access review?</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox">
+            <span>Has the decommission process been documented before launch — not after?</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CLOSING CALLOUT -->
+    <div class="closing-callout">
+      <div class="closing-callout-label">A note on scope</div>
+      <p>This checklist is a starting point. Every enterprise environment carries its own complexity, risk profile, and regulatory context. A comprehensive AI agent governance framework goes significantly deeper.</p>
+      <p>If you'd like to discuss what that looks like for your organization — <a href="https://www.linkedin.com/in/karthikmahadevan06/" target="_blank" rel="noopener">connect with me on LinkedIn</a>. I'm always happy to continue the conversation.</p>
+    </div>
+
+    <!-- CLOSING LINE -->
+    <div class="core-idea">
+      <div class="pullquote">The best time to ask what your agent can reach is before you launch it. The second best time is right now.</div>
+    </div>
+
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section no-print">
+    <div class="progress-header">
+      <div class="progress-label">Series Progress</div>
+      <div class="progress-count">Day 15 / 30</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 50%"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 15 OF 30 · ARC 3 · AI AND SECURITY</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+</body>
+</html>
