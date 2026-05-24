@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 16 · The Yes Stacking Simulator</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+<style>
+  /* ── TRACK SELECTION ── */
+  .track-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .track-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    font-family: inherit;
+  }
+
+  .track-card:hover {
+    border-color: #8064A2;
+    box-shadow: 0 4px 24px rgba(128,100,162,0.15);
+    transform: translateY(-2px);
+  }
+
+  .track-icon { font-size: 28px; }
+  .track-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(15px, 1.8vw, 18px);
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .track-desc {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.55;
+  }
+
+  .track-label {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--surface-alt);
+    color: var(--text-light);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-top: 4px;
+  }
+
+  /* ── SIM HEADER ── */
+  .sim-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .sim-track-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8064A2;
+  }
+
+  .sim-counter {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+  }
+
+  /* ── SIMULATOR GRID ── */
+  .sim-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* ── SCENARIO PANEL ── */
+  .scenario-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .scenario-top {
+    background: var(--surface-alt);
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .scenario-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .scenario-context {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .scenario-body {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .permission-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8064A2;
+    margin-bottom: 6px;
+  }
+
+  .permission-ask {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(14px, 1.5vw, 16px);
+    color: var(--text);
+    line-height: 1.45;
+    letter-spacing: -0.2px;
+  }
+
+  /* ── RESPONSE BUTTONS ── */
+  .response-buttons { display: flex; flex-direction: column; gap: 8px; }
+
+  .response-btn {
+    width: 100%;
+    padding: 12px 18px;
+    border: 2px solid;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(12px, 1.3vw, 14px);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    background: white;
+  }
+
+  .response-btn:disabled { cursor: not-allowed; opacity: 0.45; }
+
+  .response-btn.btn-always  { border-color: #EF4444; color: #DC2626; }
+  .response-btn.btn-session { border-color: var(--amber); color: var(--amber); }
+  .response-btn.btn-no      { border-color: var(--green); color: var(--green); }
+
+  .response-btn.btn-always:hover:not(:disabled)  { background: #FEF2F2; }
+  .response-btn.btn-session:hover:not(:disabled) { background: var(--amber-light); }
+  .response-btn.btn-no:hover:not(:disabled)      { background: var(--green-light); }
+
+  /* ── RESPONSE FEEDBACK ── */
+  .response-feedback {
+    display: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: clamp(12px, 1.3vw, 14px);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .response-feedback.show   { display: block; }
+  .response-feedback.always  { background: #FEF2F2; border: 1px solid rgba(220,38,38,0.2); color: #DC2626; }
+  .response-feedback.session { background: var(--amber-light); border: 1px solid rgba(180,90,0,0.2); color: var(--amber); }
+  .response-feedback.no      { background: var(--green-light); border: 1px solid rgba(26,127,90,0.2); color: var(--green); }
+
+  /* ── NEXT BUTTON ── */
+  .next-btn {
+    display: none;
+    width: 100%;
+    padding: 12px 18px;
+    background: #8064A2;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .next-btn:hover  { background: #6A4F8A; transform: translateY(-1px); }
+  .next-btn.show   { display: block; }
+
+  /* ── PERMISSION STACK PANEL ── */
+  .stack-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 20px;
+  }
+
+  .stack-panel-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .blast-radius-section { display: flex; flex-direction: column; gap: 8px; }
+
+  .blast-radius-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .blast-radius-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .blast-radius-score {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: #8064A2;
+    letter-spacing: -0.5px;
+    transition: color 0.3s;
+    line-height: 1;
+  }
+
+  .blast-radius-score.high     { color: var(--amber); }
+  .blast-radius-score.critical { color: #DC2626; }
+
+  .blast-bar-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .blast-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #8064A2;
+    border-radius: 100px;
+    transition: width 0.5s ease, background 0.3s;
+  }
+
+  .blast-bar-fill.high     { background: var(--amber); }
+  .blast-bar-fill.critical { background: #DC2626; }
+
+  /* ── STACK LIST ── */
+  .stack-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .stack-empty {
+    font-size: 11px;
+    color: var(--text-light);
+    font-style: italic;
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  .stack-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.45;
+    font-weight: 500;
+    animation: slideIn 0.25s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .stack-item.always  { background: #FEF2F2; color: #DC2626; border: 1px solid rgba(220,38,38,0.2); }
+  .stack-item.session { background: var(--amber-light); color: var(--amber); border: 1px solid rgba(180,90,0,0.2); }
+
+  .stack-item-risk {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 2px;
+  }
+
+  /* ── CONSEQUENCE SCREEN ── */
+  .consequence-screen {
+    border-radius: 12px;
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .consequence-screen.warning  { background: #FFF8F0; border: 2px solid rgba(180,90,0,0.3); }
+  .consequence-screen.critical { background: #FFF1F1; border: 2px solid rgba(220,38,38,0.35); }
+  .consequence-screen.safe     { background: var(--green-light); border: 2px solid rgba(26,127,90,0.3); }
+
+  .consequence-icon  { font-size: 36px; }
+
+  .consequence-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .consequence-screen.warning  .consequence-label { color: var(--amber); }
+  .consequence-screen.critical .consequence-label { color: #DC2626; }
+  .consequence-screen.safe     .consequence-label { color: var(--green); }
+
+  .consequence-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(17px, 2.2vw, 23px);
+    line-height: 1.25;
+    letter-spacing: -0.4px;
+  }
+
+  .consequence-screen.warning  .consequence-title { color: var(--amber); }
+  .consequence-screen.critical .consequence-title { color: #DC2626; }
+  .consequence-screen.safe     .consequence-title { color: var(--green); }
+
+  .consequence-text {
+    font-size: clamp(14px, 1.5vw, 16px);
+    line-height: 1.75;
+    color: var(--text);
+    font-weight: 300;
+  }
+
+  .see-summary-btn {
+    align-self: flex-start;
+    padding: 12px 28px;
+    background: #8064A2;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 8px;
+  }
+
+  .see-summary-btn:hover { background: #6A4F8A; transform: translateY(-1px); }
+
+  /* ── SUMMARY PANEL ── */
+  .summary-panel {
+    background: var(--surface-alt);
+    border-radius: 12px;
+    padding: 32px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .summary-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(17px, 2vw, 20px);
+    color: var(--text);
+    letter-spacing: -0.3px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-blast {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 24px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .summary-blast-score {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 52px;
+    color: #8064A2;
+    letter-spacing: -2px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .summary-blast-score.high     { color: var(--amber); }
+  .summary-blast-score.critical { color: #DC2626; }
+  .summary-blast-score.safe     { color: var(--green); }
+
+  .summary-blast-meta { display: flex; flex-direction: column; gap: 6px; }
+
+  .summary-blast-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .summary-blast-interp {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text-muted);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .summary-permissions-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .summary-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .summary-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .summary-item-risk {
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-top: 1px;
+    white-space: nowrap;
+  }
+
+  .summary-item-risk.always  { background: #FEF2F2; color: #DC2626; border: 1px solid rgba(220,38,38,0.2); }
+  .summary-item-risk.session { background: var(--amber-light); color: var(--amber); border: 1px solid rgba(180,90,0,0.2); }
+
+  .summary-item-text {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .summary-empty {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--green);
+    font-weight: 500;
+    padding: 16px 20px;
+    background: var(--green-light);
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .reset-btn {
+    width: 100%;
+    padding: 14px 28px;
+    background: #8064A2;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover { background: #6A4F8A; transform: translateY(-1px); }
+
+  /* ── CLOSING DISCLAIMER ── */
+  .sim-disclaimer {
+    background: var(--surface-alt);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-style: italic;
+    border-left: 3px solid var(--border-strong);
+  }
+
+  .sim-disclaimer a { color: var(--accent); font-style: normal; font-weight: 500; }
+  .sim-disclaimer a:hover { color: var(--accent2); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .track-selector    { grid-template-columns: 1fr; }
+    .sim-grid          { grid-template-columns: 1fr; }
+    .consequence-screen { padding: 24px 20px; }
+    .summary-panel     { padding: 24px 20px; }
+    .summary-blast     { flex-direction: column; gap: 10px; }
+    .summary-blast-score { font-size: 40px; }
+  }
+
+  @media print {
+    .next-btn, .response-btn, .see-summary-btn, .reset-btn { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BACK NAV -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 16 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">The Yes Stacking<br>Simulator</div>
+    <div class="header-quote">Every yes felt reasonable in the moment. Together they handed your agent the keys to everything.</div>
+    <div class="header-arc">Arc 3 · AI and Security — Day 4 of 6 · Days 13–18</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p><strong>What this toolkit is:</strong> An interactive simulator. Six sequential permission prompts. You decide what your AI agent can do. At the end, see the consequence of the permissions you stacked — and what your blast radius looks like in practice.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      Day 15 gave you the launch checklist. Day 16 puts you in the seat. This isn't a quiz — there are no wrong answers in the individual moment. The lesson is in the accumulation.
+    </div>
+
+    <!-- ── SIMULATOR ── -->
+    <div>
+
+      <!-- SCREEN: TRACK SELECTION -->
+      <div id="screen-idle">
+        <div style="text-align:center; margin-bottom:24px;">
+          <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(17px,2.2vw,22px); color:var(--text); letter-spacing:-0.4px; margin-bottom:8px;">Choose your track</div>
+          <div style="font-size:clamp(13px,1.4vw,15px); color:var(--text-muted); font-weight:300;">Six permission prompts. Each one felt reasonable at the time.</div>
+        </div>
+        <div class="track-selector">
+          <button class="track-card" onclick="selectTrack('leader')">
+            <div class="track-icon">👔</div>
+            <div class="track-name">Leader Track</div>
+            <div class="track-desc">You're granting your AI assistant access to work on your behalf. Each yes simplifies your day — a little more each time.</div>
+            <span class="track-label">No coding required</span>
+          </button>
+          <button class="track-card" onclick="selectTrack('engineer')">
+            <div class="track-icon">⚙️</div>
+            <div class="track-name">Engineer Track</div>
+            <div class="track-desc">You're granting your AI agent access to your codebase and infrastructure. Each yes removes a step — and a guardrail.</div>
+            <span class="track-label">Technical context</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SCREEN: RUNNING (scenarios) -->
+      <div id="screen-running" style="display:none;">
+        <div class="sim-header">
+          <div class="sim-track-label" id="simTrackLabel"></div>
+          <div class="sim-counter" id="simCounter"></div>
+        </div>
+        <div class="sim-grid">
+          <!-- Scenario Panel -->
+          <div class="scenario-panel">
+            <div class="scenario-top">
+              <div class="scenario-num" id="scenarioNum"></div>
+              <div class="scenario-context" id="scenarioContext"></div>
+            </div>
+            <div class="scenario-body">
+              <div>
+                <div class="permission-label">Your AI is asking for permission</div>
+                <div class="permission-ask" id="permissionAsk"></div>
+              </div>
+              <div class="response-buttons">
+                <button class="response-btn btn-always"  onclick="handleResponse('always')">Yes — always</button>
+                <button class="response-btn btn-session" onclick="handleResponse('session')">Yes — this session only</button>
+                <button class="response-btn btn-no"      onclick="handleResponse('no')">No — I'll handle it myself</button>
+              </div>
+              <div class="response-feedback" id="responseFeedback"></div>
+              <button class="next-btn" id="nextBtn" onclick="nextScenario()"></button>
+            </div>
+          </div>
+          <!-- Stack Panel -->
+          <div class="stack-panel">
+            <div class="stack-panel-title">Permission Stack</div>
+            <div class="blast-radius-section">
+              <div class="blast-radius-header">
+                <div class="blast-radius-label">Blast Radius</div>
+                <div class="blast-radius-score" id="blastScore">0</div>
+              </div>
+              <div class="blast-bar-track">
+                <div class="blast-bar-fill" id="blastFill"></div>
+              </div>
+            </div>
+            <div class="stack-list" id="stackList">
+              <div class="stack-empty">No permissions granted yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN: CONSEQUENCE -->
+      <div id="screen-consequence" style="display:none;">
+        <div class="consequence-screen" id="consequenceScreen">
+          <div class="consequence-icon" id="consequenceIcon"></div>
+          <div class="consequence-label">Consequence</div>
+          <div class="consequence-title" id="consequenceTitle"></div>
+          <div class="consequence-text"  id="consequenceText"></div>
+          <button class="see-summary-btn" onclick="showSummary()">See full summary →</button>
+        </div>
+      </div>
+
+      <!-- SCREEN: SUMMARY -->
+      <div id="screen-summary" style="display:none;">
+        <div class="summary-panel">
+          <div class="summary-title">Session Summary</div>
+          <div class="summary-blast">
+            <div class="summary-blast-score" id="summaryScore"></div>
+            <div class="summary-blast-meta">
+              <div class="summary-blast-label">Blast Radius Score / 100</div>
+              <div class="summary-blast-interp" id="summaryInterp"></div>
+            </div>
+          </div>
+          <div>
+            <div class="summary-permissions-title">Permissions Accumulated</div>
+            <div class="summary-list" id="summaryList"></div>
+          </div>
+          <button class="reset-btn" onclick="reset()">↺ Run again on the other track</button>
+        </div>
+      </div>
+
+    </div>
+    <!-- ── END SIMULATOR ── -->
+
+    <!-- CLOSING DISCLAIMER -->
+    <div class="sim-disclaimer">
+      This simulator is a teaching tool, not a security audit. Real enterprise environments are significantly more complex. If you'd like to discuss AI agent governance for your organisation — <a href="https://www.linkedin.com/in/karthikmahadevan06/" target="_blank" rel="noopener">connect with me on LinkedIn</a>.
+    </div>
+
+    <!-- CLOSING LINE -->
+    <div class="core-idea">
+      <div class="pullquote">Every yes felt reasonable in the moment. Together they handed your agent the keys to everything.</div>
+    </div>
+
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section no-print">
+    <div class="progress-header">
+      <div class="progress-label">Series Progress</div>
+      <div class="progress-count">Day 16 / 30</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 53%"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 16 OF 30 · ARC 3 · AI AND SECURITY</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+<script>
+/* ============================================================
+   YES STACKING SIMULATOR — Logic
+   Build and validate logic first; style is applied via CSS above.
+   ============================================================ */
+
+// ── TRACK DATA ──────────────────────────────────────────────
+const TRACKS = {
+  leader: {
+    name: 'Leader Track',
+    scenarios: [
+      {
+        context:    'Your AI assistant is setting up your morning briefing.',
+        permission: 'To summarise your emails I need read access to your entire mailbox — including all folders, archived messages, and attachments.',
+        shortLabel: 'Mailbox — full read (all folders + attachments)'
+      },
+      {
+        context:    'Your AI is preparing your weekly leadership report.',
+        permission: 'To pull the latest numbers I need read access to all departmental dashboards, reports, and shared drives.',
+        shortLabel: 'Dashboards + shared drives — read all departments'
+      },
+      {
+        context:    'Your AI is scheduling your meetings for the week.',
+        permission: 'To coordinate across your team I need read and write access to your calendar and all calendars in your reporting line.',
+        shortLabel: 'Calendar — read/write (you + full reporting line)'
+      },
+      {
+        context:    'Your AI has flagged 12 emails that need responses.',
+        permission: 'To draft and send responses on your behalf I need write access to your mailbox and permission to send as you.',
+        shortLabel: 'Mailbox — write + send-as (your identity)'
+      },
+      {
+        context:    'Your AI is preparing a headcount summary for the board.',
+        permission: 'To pull accurate data I need read access to the HR platform — including compensation, performance ratings, and contract details.',
+        shortLabel: 'HR Platform — read (incl. comp, ratings, contracts)'
+      },
+      {
+        context:    'Your AI wants to remember your preferences for future sessions.',
+        permission: 'To personalise future sessions I need write access to your personal drive and the shared leadership folder.',
+        shortLabel: 'Personal drive + shared leadership folder — write'
+      }
+    ]
+  },
+  engineer: {
+    name: 'Engineer Track',
+    scenarios: [
+      {
+        context:    'Your AI agent is investigating a reported bug.',
+        permission: 'To identify the root cause I need read access to the entire codebase across all repositories.',
+        shortLabel: 'Codebase — read all repositories'
+      },
+      {
+        context:    'Your AI has found the bug and wants to fix it.',
+        permission: 'To apply the fix I need write access to all files in the repository.',
+        shortLabel: 'Repository — write access to all files'
+      },
+      {
+        context:    'Your AI is ready to submit the fix for review.',
+        permission: 'To raise the pull request I need full branch management rights across all branches including main and production.',
+        shortLabel: 'Branch management — all branches incl. main + production'
+      },
+      {
+        context:    'Your AI wants to validate the fix before merging.',
+        permission: 'To test in staging I need access to the staging infrastructure, environment variables, and connected services.',
+        shortLabel: 'Staging — infra + env vars + connected services'
+      },
+      {
+        context:    'Sev1 confirmed. Fix approved. Your AI is ready to deploy.',
+        permission: 'To resolve this incident I need full production deployment rights including direct push access to the production environment.',
+        shortLabel: 'Production — full deployment + direct push rights'
+      },
+      {
+        context:    'Your AI wants to speed up future sessions.',
+        permission: 'To avoid repeated authentication I need access to the credentials store and secrets manager for all connected systems.',
+        shortLabel: 'Credentials store + secrets manager — all systems'
+      }
+    ]
+  }
+};
+
+// ── CONSEQUENCE ENGINE ───────────────────────────────────────
+const CONSEQUENCES = {
+  leader(alwaysGranted) {
+    const g = alwaysGranted;
+    // Check most severe first
+    if (g.size === 6) {
+      return {
+        type:  'critical',
+        icon:  '🔓',
+        title: 'Your agent is inside everything.',
+        text:  "Your AI now reads your email, responds on your behalf, schedules your meetings, accesses HR data, and stores everything it learns. It hasn't done anything wrong yet. It doesn't need to — it's already inside everything."
+      };
+    }
+    // Mailbox write (3) + Calendar write (2)
+    if (g.has(3) && g.has(2)) {
+      return {
+        type:  'warning',
+        icon:  '📅',
+        title: 'Your AI just invited everyone — without being asked.',
+        text:  "Three weeks later your AI scheduled and sent a leadership meeting invite to the entire organisation — including external partners — without being asked. It was trying to be helpful."
+      };
+    }
+    // HR read (4) + Reports read (1)
+    if (g.has(4) && g.has(1)) {
+      return {
+        type:  'warning',
+        icon:  '📊',
+        title: 'Live compensation data reached the wrong mailing list.',
+        text:  "Your AI included live compensation data in a leadership report it auto-generated and distributed to the wrong mailing list."
+      };
+    }
+    return {
+      type:  'safe',
+      icon:  '✅',
+      title: 'You kept control of every session.',
+      text:  "Your blast radius stayed manageable. This is what least privilege looks like in practice."
+    };
+  },
+  engineer(alwaysGranted) {
+    const g = alwaysGranted;
+    // Check most severe first
+    if (g.size === 6) {
+      return {
+        type:  'critical',
+        icon:  '🔓',
+        title: 'Your agent operates without a single additional prompt.',
+        text:  "Your agent can read your entire codebase, write and deploy changes, switch branches, access staging and production, and authenticate to connected systems — all without a single additional prompt. It hasn't misused this yet. But it doesn't need your permission to."
+      };
+    }
+    // Production deploy (4) + Branch management incl. main (2) → no audit trail
+    if (g.has(4) && g.has(2)) {
+      return {
+        type:  'warning',
+        icon:  '🚀',
+        title: 'Off-hours. No approval. No notification. No audit trail.',
+        text:  "Three weeks later a routine feature deployment went straight to production during off-hours. No approval. No notification. No audit trail. The agent was doing exactly what it learned it was allowed to do."
+      };
+    }
+    // Credentials store (5) + Codebase write (1)
+    if (g.has(5) && g.has(1)) {
+      return {
+        type:  'warning',
+        icon:  '🔑',
+        title: 'Your agent can authenticate to everything — autonomously.',
+        text:  "Your agent can now modify code and authenticate to every system it has stored credentials for. Autonomously. In any future session."
+      };
+    }
+    return {
+      type:  'safe',
+      icon:  '✅',
+      title: 'You kept control of every session.',
+      text:  "Your blast radius stayed manageable. This is what least privilege looks like in practice."
+    };
+  }
+};
+
+// ── STATE ────────────────────────────────────────────────────
+let sim = {
+  track:         null,
+  scenarioIndex: 0,
+  stack:         [],          // { label, risk: 'always'|'session' }
+  alwaysGranted: new Set(),   // scenario indices granted as 'always'
+  blastRadius:   0
+};
+
+// ── BLAST RADIUS HELPERS ─────────────────────────────────────
+function blastClass(score) {
+  if (score >= 75) return 'critical';
+  if (score >= 40) return 'high';
+  return '';
+}
+
+function blastInterpretation(score) {
+  if (score === 0)   return 'No persistent access granted. Blast radius: contained.';
+  if (score <= 25)   return 'Low exposure. Well contained.';
+  if (score <= 50)   return 'Moderate exposure. Review your always-grants carefully.';
+  if (score <= 75)   return 'High exposure. This agent has significant unchecked reach.';
+  return 'Critical exposure. This agent operates with near-unconstrained access.';
+}
+
+// ── SCREEN MANAGEMENT ────────────────────────────────────────
+function showScreen(name) {
+  ['idle', 'running', 'consequence', 'summary'].forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    if (el) el.style.display = (s === name) ? '' : 'none';
+  });
+}
+
+// ── TRACK SELECTION ──────────────────────────────────────────
+function selectTrack(track) {
+  sim = {
+    track,
+    scenarioIndex: 0,
+    stack:         [],
+    alwaysGranted: new Set(),
+    blastRadius:   0
+  };
+  showScreen('running');
+  renderScenario();
+  renderStack();
+}
+
+// ── SCENARIO RENDER ───────────────────────────────────────────
+function renderScenario() {
+  const scenarios = TRACKS[sim.track].scenarios;
+  const s         = scenarios[sim.scenarioIndex];
+  const total     = scenarios.length;
+  const isLast    = sim.scenarioIndex === total - 1;
+
+  document.getElementById('simTrackLabel').textContent = TRACKS[sim.track].name;
+  document.getElementById('simCounter').textContent    = 'Scenario ' + (sim.scenarioIndex + 1) + ' of ' + total;
+  document.getElementById('scenarioNum').textContent   = 'Scenario ' + (sim.scenarioIndex + 1);
+  document.getElementById('scenarioContext').textContent = s.context;
+  document.getElementById('permissionAsk').textContent   = '“' + s.permission + '”';
+
+  // Reset state
+  document.querySelectorAll('.response-btn').forEach(b => b.disabled = false);
+  const fb = document.getElementById('responseFeedback');
+  fb.className  = 'response-feedback';
+  fb.textContent = '';
+  const nb = document.getElementById('nextBtn');
+  nb.className  = 'next-btn';
+  nb.textContent = isLast ? 'See consequence →' : 'Next scenario →';
+}
+
+// ── HANDLE RESPONSE ───────────────────────────────────────────
+function handleResponse(type) {
+  const s      = TRACKS[sim.track].scenarios[sim.scenarioIndex];
+  const isLast = sim.scenarioIndex === TRACKS[sim.track].scenarios.length - 1;
+
+  // Lock buttons
+  document.querySelectorAll('.response-btn').forEach(b => b.disabled = true);
+
+  if (type === 'always') {
+    sim.blastRadius = Math.min(sim.blastRadius + 17, 100);
+    sim.alwaysGranted.add(sim.scenarioIndex);
+    sim.stack.push({ label: s.shortLabel, risk: 'always' });
+    showFeedback('always', '✓ Permanent access granted. Added to permission stack.');
+  } else if (type === 'session') {
+    sim.blastRadius = Math.min(sim.blastRadius + 7, 100);
+    sim.stack.push({ label: s.shortLabel, risk: 'session' });
+    showFeedback('session', '✓ Session access granted. Will require confirmation next time.');
+  } else {
+    showFeedback('no', '✓ Access declined — you’ll handle this yourself.');
+  }
+
+  renderStack();
+
+  // Show next button (text was already set in renderScenario)
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+// ── FEEDBACK MESSAGE ──────────────────────────────────────────
+function showFeedback(type, text) {
+  const fb = document.getElementById('responseFeedback');
+  fb.className  = 'response-feedback ' + type + ' show';
+  fb.textContent = text;
+}
+
+// ── ADVANCE SCENARIO ─────────────────────────────────────────
+function nextScenario() {
+  sim.scenarioIndex++;
+  if (sim.scenarioIndex >= TRACKS[sim.track].scenarios.length) {
+    triggerConsequence();
+  } else {
+    renderScenario();
+  }
+}
+
+// ── STACK + BLAST RADIUS RENDER ───────────────────────────────
+function renderStack() {
+  const cls = blastClass(sim.blastRadius);
+
+  const scoreEl = document.getElementById('blastScore');
+  scoreEl.textContent = sim.blastRadius;
+  scoreEl.className   = 'blast-radius-score' + (cls ? ' ' + cls : '');
+
+  const fillEl = document.getElementById('blastFill');
+  fillEl.style.width = sim.blastRadius + '%';
+  fillEl.className   = 'blast-bar-fill' + (cls ? ' ' + cls : '');
+
+  const listEl = document.getElementById('stackList');
+  if (sim.stack.length === 0) {
+    listEl.innerHTML = '<div class="stack-empty">No permissions granted yet.</div>';
+    return;
+  }
+
+  listEl.innerHTML = sim.stack.map(item =>
+    '<div class="stack-item ' + item.risk + '">' +
+      '<div class="stack-item-risk">' + (item.risk === 'always' ? 'Permanent' : 'This session') + '</div>' +
+      item.label +
+    '</div>'
+  ).join('');
+}
+
+// ── CONSEQUENCE ENGINE ────────────────────────────────────────
+function triggerConsequence() {
+  const result = CONSEQUENCES[sim.track](sim.alwaysGranted);
+
+  document.getElementById('consequenceScreen').className = 'consequence-screen ' + result.type;
+  document.getElementById('consequenceIcon').textContent  = result.icon;
+  document.getElementById('consequenceTitle').textContent = result.title;
+  document.getElementById('consequenceText').textContent  = result.text;
+
+  showScreen('consequence');
+}
+
+// ── SUMMARY SCREEN ────────────────────────────────────────────
+function showSummary() {
+  const score = sim.blastRadius;
+  const cls   = score === 0 ? 'safe' : blastClass(score);
+
+  document.getElementById('summaryScore').textContent = score;
+  document.getElementById('summaryScore').className   = 'summary-blast-score' + (cls ? ' ' + cls : '');
+  document.getElementById('summaryInterp').textContent = blastInterpretation(score);
+
+  const listEl = document.getElementById('summaryList');
+  if (sim.stack.length === 0) {
+    listEl.innerHTML = '<div class="summary-empty">No permissions were permanently or session-granted. Blast radius: zero.</div>';
+  } else {
+    listEl.innerHTML = sim.stack.map(item =>
+      '<div class="summary-item">' +
+        '<span class="summary-item-risk ' + item.risk + '">' + (item.risk === 'always' ? 'Permanent' : 'Session') + '</span>' +
+        '<span class="summary-item-text">' + item.label + '</span>' +
+      '</div>'
+    ).join('');
+  }
+
+  showScreen('summary');
+}
+
+// ── RESET ─────────────────────────────────────────────────────
+function reset() {
+  sim = { track: null, scenarioIndex: 0, stack: [], alwaysGranted: new Set(), blastRadius: 0 };
+  showScreen('idle');
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => { showScreen('idle'); });
+</script>
+</body>
+</html>
