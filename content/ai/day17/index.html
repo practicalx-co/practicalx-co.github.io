@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 17 · AAST — Agentic Application Security Testing</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+<style>
+  /* ── GATE CARDS ── */
+  .gate-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #383838;
+  }
+
+  .gate-card {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .gate-card:last-child { border-right: none; }
+
+  .gate-card-header {
+    background: #8064A2;
+    color: white;
+    padding: 18px 20px 14px;
+  }
+
+  .gate-card-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-bottom: 6px;
+  }
+
+  .gate-card-name {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(14px, 1.4vw, 16px);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 4px;
+  }
+
+  .gate-card-subtitle {
+    font-size: 11px;
+    opacity: 0.8;
+    font-style: italic;
+  }
+
+  .gate-card-body {
+    background: #383838;
+    color: #E8E8E8;
+    padding: 18px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .gate-card-checks {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    flex: 1;
+  }
+
+  .gate-card-checks li {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: clamp(11px, 1.1vw, 13px);
+    line-height: 1.5;
+    color: #D8D8D8;
+  }
+
+  .gate-card-checks li::before {
+    content: '→';
+    color: #8064A2;
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 11px;
+  }
+
+  .gate-card-owasp {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(128,100,162,0.85);
+    letter-spacing: 0.5px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .gate-cards {
+      grid-template-columns: 1fr;
+    }
+    .gate-card {
+      border-right: none;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .gate-card:last-child { border-bottom: none; }
+  }
+
+  /* ── SELF ASSESSMENT ── */
+  .assessment-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 24px;
+  }
+
+  .assessment-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(18px, 2vw, 22px);
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .assessment-subheading {
+    font-size: clamp(13px, 1.3vw, 15px);
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .aast-gate {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .aast-gate-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8064A2;
+    padding: 0 0 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .aast-check {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .aast-check.answered { border-color: var(--border-strong); }
+
+  .aast-check-text {
+    font-size: clamp(13px, 1.35vw, 15px);
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .aast-check-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .aast-btn {
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .aast-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+  .aast-btn.selected-yes {
+    background: var(--green-light);
+    border-color: rgba(26,127,90,0.3);
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .aast-btn.selected-partial {
+    background: var(--amber-light);
+    border-color: rgba(180,90,0,0.3);
+    color: var(--amber);
+    font-weight: 500;
+  }
+
+  .aast-btn.selected-no {
+    background: var(--red-light);
+    border-color: rgba(155,28,28,0.3);
+    color: var(--red);
+    font-weight: 500;
+  }
+
+  /* ── SCORE PANEL ── */
+  .score-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+  }
+
+  .score-panel-block { display: flex; flex-direction: column; gap: 4px; }
+
+  .score-panel-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .score-panel-value {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    color: #8064A2;
+    line-height: 1;
+  }
+
+  .score-panel-max {
+    font-size: clamp(14px, 1.5vw, 18px);
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .score-panel-answered {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(13px, 1.4vw, 16px);
+    color: var(--text-muted);
+  }
+
+  /* ── ASSESSMENT GATES LAYOUT ── */
+  .assessment-gates {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* ── SCORE RESULT ── */
+  .score-result {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px 32px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: white;
+    animation: fadeSlideIn 0.4s ease;
+  }
+
+  .score-result.visible { display: flex; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .score-result-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .score-result-tier {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(22px, 2.5vw, 28px);
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .score-result-score {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(13px, 1.3vw, 15px);
+    color: var(--text-muted);
+  }
+
+  .score-result-desc {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    line-height: 1.65;
+    font-weight: 300;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  .assessment-disclaimer {
+    background: var(--accent-light);
+    border: 1px solid rgba(91,63,191,0.15);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-size: clamp(12px, 1.25vw, 14px);
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .assessment-disclaimer a {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .reset-btn {
+    align-self: flex-start;
+    padding: 10px 22px;
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover {
+    border-color: #8064A2;
+    color: #8064A2;
+  }
+
+  /* ── OWASP ATTRIBUTION ── */
+  .owasp-attribution {
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-light);
+    padding: 12px 0;
+    letter-spacing: 0.3px;
+  }
+
+  .owasp-attribution a {
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .owasp-attribution a:hover { color: #8064A2; }
+</style>
+</head>
+<body>
+
+<!-- BACK NAV -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 17 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">AAST — Agentic Application<br>Security Testing</div>
+    <div class="header-quote">Every mature pipeline has DAST. Every future-ready pipeline will have AAST.</div>
+    <div class="header-arc">Arc 3 · AI and Security — Day 5 of 6 · Days 13–18</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p>OWASP published the Top 10 for Agentic Applications in December 2025 — a peer-reviewed framework mapping the ten most critical risks facing autonomous AI agents. AAST is the implementation bridge that puts those risks into your pipeline as testable, enforceable gates.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      Arc 3 has covered the threat model, the interlude, and the pre-launch checklist. Day 17 moves from checklists to pipelines — the four gates every agentic deployment should pass through.
+    </div>
+
+    <!-- SECTION 1: AAST REFERENCE CARD -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-purple">🔬</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 1 of 2</div>
+          <div class="section-title" style="color:#8064A2;">AAST Reference Card</div>
+        </div>
+      </div>
+
+      <div class="gate-cards">
+
+        <!-- CARD 1: DESIGN GATE -->
+        <div class="gate-card">
+          <div class="gate-card-header">
+            <div class="gate-card-num">Gate 01</div>
+            <div class="gate-card-name">Design Gate</div>
+            <div class="gate-card-subtitle">Before development starts</div>
+          </div>
+          <div class="gate-card-body">
+            <ul class="gate-card-checks">
+              <li>Threat model the agent's goals and decision boundaries</li>
+              <li>Define identity and permission scope</li>
+              <li>Map human approval touchpoints</li>
+            </ul>
+            <div class="gate-card-owasp">Covers ASI01 · ASI03 · ASI09</div>
+          </div>
+        </div>
+
+        <!-- CARD 2: BUILD GATE -->
+        <div class="gate-card">
+          <div class="gate-card-header">
+            <div class="gate-card-num">Gate 02</div>
+            <div class="gate-card-name">Build Gate</div>
+            <div class="gate-card-subtitle">During development</div>
+          </div>
+          <div class="gate-card-body">
+            <ul class="gate-card-checks">
+              <li>Validate every tool integration against a permitted tools registry</li>
+              <li>Audit third party components and MCP servers</li>
+              <li>Test for unexpected code execution paths</li>
+            </ul>
+            <div class="gate-card-owasp">Covers ASI02 · ASI04 · ASI05</div>
+          </div>
+        </div>
+
+        <!-- CARD 3: PRE-DEPLOY GATE -->
+        <div class="gate-card">
+          <div class="gate-card-header">
+            <div class="gate-card-num">Gate 03</div>
+            <div class="gate-card-name">Pre-Deploy Gate</div>
+            <div class="gate-card-subtitle">Before go-live</div>
+          </div>
+          <div class="gate-card-body">
+            <ul class="gate-card-checks">
+              <li>Test memory and context inputs for poisoning</li>
+              <li>Validate inter-agent communication authentication</li>
+              <li>Simulate cascading failure scenarios</li>
+            </ul>
+            <div class="gate-card-owasp">Covers ASI06 · ASI07 · ASI08</div>
+          </div>
+        </div>
+
+        <!-- CARD 4: RUNTIME GATE -->
+        <div class="gate-card">
+          <div class="gate-card-header">
+            <div class="gate-card-num">Gate 04</div>
+            <div class="gate-card-name">Runtime Gate</div>
+            <div class="gate-card-subtitle">Continuous post-deployment</div>
+          </div>
+          <div class="gate-card-body">
+            <ul class="gate-card-checks">
+              <li>Monitor for behavioural drift against baseline</li>
+              <li>Alert on permission scope expansion</li>
+              <li>Periodic least agency review</li>
+            </ul>
+            <div class="gate-card-owasp">Covers ASI10 · ASI01 · ASI03</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 2: SELF ASSESSMENT -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-blue">📊</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 2 of 2</div>
+          <div class="section-title blue">AAST Self Assessment</div>
+        </div>
+      </div>
+
+      <div class="assessment-intro">
+        <div class="assessment-heading">How does your pipeline score?</div>
+        <div class="assessment-subheading">Rate your organisation against each gate. Be honest.</div>
+      </div>
+
+      <!-- SCORE PANEL -->
+      <div class="score-panel">
+        <div class="score-panel-block">
+          <div class="score-panel-label">Current Score</div>
+          <div class="score-panel-value">
+            <span id="score-current">0</span><span class="score-panel-max"> / 24</span>
+          </div>
+        </div>
+        <div class="score-panel-block" style="text-align:right;">
+          <div class="score-panel-label">Answered</div>
+          <div class="score-panel-answered" id="score-answered">0 / 12</div>
+        </div>
+      </div>
+
+      <!-- GATE CHECKS -->
+      <div class="assessment-gates">
+
+        <!-- DESIGN GATE -->
+        <div class="aast-gate">
+          <div class="aast-gate-label">Gate 01 — Design Gate</div>
+
+          <div class="aast-check" data-idx="0">
+            <div class="aast-check-text">We threat model every AI agent before development begins</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(0,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(0,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(0,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="aast-check" data-idx="1">
+            <div class="aast-check-text">Every agent has a defined identity and permission scope documented upfront</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(1,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(1,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(1,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="aast-check" data-idx="2">
+            <div class="aast-check-text">Human approval touchpoints are mapped before any code is written</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(2,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(2,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(2,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- BUILD GATE -->
+        <div class="aast-gate">
+          <div class="aast-gate-label">Gate 02 — Build Gate</div>
+
+          <div class="aast-check" data-idx="3">
+            <div class="aast-check-text">We maintain a permitted tools registry that every agent integration is validated against</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(3,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(3,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(3,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="aast-check" data-idx="4">
+            <div class="aast-check-text">Third party components and MCP servers are audited before use</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(4,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(4,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(4,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="aast-check" data-idx="5">
+            <div class="aast-check-text">We test for unexpected code execution paths during development</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(5,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(5,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(5,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRE-DEPLOY GATE -->
+        <div class="aast-gate">
+          <div class="aast-gate-label">Gate 03 — Pre-Deploy Gate</div>
+
+          <div class="aast-check" data-idx="6">
+            <div class="aast-check-text">We test agent memory and context inputs for poisoning vulnerability</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(6,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(6,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(6,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="aast-check" data-idx="7">
+            <div class="aast-check-text">Inter-agent communication is authenticated and integrity-checked</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(7,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(7,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(7,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="aast-check" data-idx="8">
+            <div class="aast-check-text">We simulate cascading failure scenarios before any agent goes live</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(8,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(8,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(8,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RUNTIME GATE -->
+        <div class="aast-gate">
+          <div class="aast-gate-label">Gate 04 — Runtime Gate</div>
+
+          <div class="aast-check" data-idx="9">
+            <div class="aast-check-text">We monitor agent behaviour against a defined baseline post-deployment</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(9,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(9,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(9,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="aast-check" data-idx="10">
+            <div class="aast-check-text">Permission scope expansion triggers an alert</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(10,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(10,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(10,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="aast-check" data-idx="11">
+            <div class="aast-check-text">We conduct periodic least agency reviews after deployment</div>
+            <div class="aast-check-btns">
+              <button class="aast-btn" data-pts="2" onclick="rate(11,2,this,'yes')">✅ Yes</button>
+              <button class="aast-btn" data-pts="1" onclick="rate(11,1,this,'partial')">⚠️ Partial</button>
+              <button class="aast-btn" data-pts="0" onclick="rate(11,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /assessment-gates -->
+
+      <!-- SCORE RESULT -->
+      <div class="score-result" id="score-result">
+        <div class="score-result-label">Your Result</div>
+        <div class="score-result-tier" id="result-tier"></div>
+        <div class="score-result-score" id="result-score"></div>
+        <div class="score-result-desc" id="result-desc"></div>
+      </div>
+
+      <!-- ASSESSMENT DISCLAIMER -->
+      <div class="assessment-disclaimer" id="assessment-disclaimer" style="display:none;">
+        This assessment reflects your current state against the AAST framework. It is not a formal security audit. For a comprehensive agentic security review — <a href="https://www.linkedin.com/in/karthikmahadevan06/" target="_blank" rel="noopener">connect with me on LinkedIn</a>.
+      </div>
+
+      <!-- RESET BUTTON -->
+      <button class="reset-btn no-print" id="reset-btn" style="display:none;" onclick="resetAssessment()">Assess Again</button>
+
+    </div><!-- /section -->
+
+    <div class="divider"></div>
+
+    <!-- CLOSING LINE -->
+    <div class="core-idea">
+      <div class="pullquote">The map exists. The gates are defined. The only question is whether your pipeline has them.</div>
+    </div>
+
+    <!-- OWASP ATTRIBUTION -->
+    <div class="owasp-attribution">
+      AAST is built on the OWASP Top 10 for Agentic Applications 2026. Learn more at <a href="https://genai.owasp.org" target="_blank" rel="noopener">genai.owasp.org</a>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section no-print">
+    <div class="progress-header">
+      <div class="progress-label">Series Progress</div>
+      <div class="progress-count">Day 17 / 30</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 57%"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 17 OF 30 · ARC 3 · AI AND SECURITY</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+<script>
+(function () {
+  'use strict';
+
+  const TOTAL = 12;
+  const answers = new Array(TOTAL).fill(null);
+
+  function rate(idx, pts, btn, tier) {
+    answers[idx] = pts;
+
+    // Update button states for this check
+    const checkEl = document.querySelector('.aast-check[data-idx="' + idx + '"]');
+    checkEl.querySelectorAll('.aast-btn').forEach(function (b) {
+      b.classList.remove('selected-yes', 'selected-partial', 'selected-no');
+    });
+    btn.classList.add('selected-' + tier);
+    checkEl.classList.add('answered');
+
+    updateScore();
+  }
+
+  function updateScore() {
+    const answered = answers.filter(function (a) { return a !== null; }).length;
+    const score    = answers.reduce(function (sum, a) { return sum + (a !== null ? a : 0); }, 0);
+
+    document.getElementById('score-current').textContent = score;
+    document.getElementById('score-answered').textContent = answered + ' / ' + TOTAL;
+
+    if (answered === TOTAL) {
+      showResult(score);
+    }
+  }
+
+  function showResult(score) {
+    var tier, desc, color;
+
+    if (score >= 20) {
+      tier  = 'Pipeline Ready';
+      desc  = 'Your agentic security posture is ahead of the industry. Share this framework with your peers — they need it.';
+      color = 'var(--green)';
+    } else if (score >= 14) {
+      tier  = 'Progressing';
+      desc  = 'Solid foundations with meaningful gaps to close. Focus on the gates where you scored Partial.';
+      color = 'var(--amber)';
+    } else if (score >= 8) {
+      tier  = 'Developing';
+      desc  = 'The framework is partially in place. Prioritise the Design and Build gates first — they\'re cheapest to fix early.';
+      color = '#E07820';
+    } else {
+      tier  = 'Starting Out';
+      desc  = 'Start with Gate 1. A threat model costs nothing and catches the most.';
+      color = 'var(--red)';
+    }
+
+    var resultEl = document.getElementById('score-result');
+    document.getElementById('result-tier').textContent  = tier;
+    document.getElementById('result-tier').style.color  = color;
+    document.getElementById('result-score').textContent = 'Score: ' + score + ' / 24';
+    document.getElementById('result-desc').textContent  = desc;
+    resultEl.classList.add('visible');
+    resultEl.style.borderColor = color;
+
+    document.getElementById('assessment-disclaimer').style.display = 'block';
+    document.getElementById('reset-btn').style.display = 'block';
+
+    // Scroll result into view
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  window.rate = rate;
+
+  window.resetAssessment = function () {
+    answers.fill(null);
+
+    document.querySelectorAll('.aast-btn').forEach(function (b) {
+      b.classList.remove('selected-yes', 'selected-partial', 'selected-no');
+    });
+    document.querySelectorAll('.aast-check').forEach(function (c) {
+      c.classList.remove('answered');
+    });
+
+    document.getElementById('score-current').textContent = '0';
+    document.getElementById('score-answered').textContent = '0 / ' + TOTAL;
+
+    var resultEl = document.getElementById('score-result');
+    resultEl.classList.remove('visible');
+    resultEl.style.borderColor = '';
+
+    document.getElementById('assessment-disclaimer').style.display = 'none';
+    document.getElementById('reset-btn').style.display = 'none';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+}());
+</script>
+
+</body>
+</html>
