@@ -35,6 +35,7 @@
   }
 
   .track-icon { font-size: 28px; }
+
   .track-name {
     font-family: 'Syne', sans-serif;
     font-weight: 700;
@@ -170,12 +171,12 @@
 
   .response-btn:disabled { cursor: not-allowed; opacity: 0.45; }
 
-  .response-btn.btn-always  { border-color: #EF4444; color: #DC2626; }
   .response-btn.btn-session { border-color: var(--amber); color: var(--amber); }
+  .response-btn.btn-always  { border-color: #EF4444;  color: #DC2626; }
   .response-btn.btn-no      { border-color: var(--green); color: var(--green); }
 
-  .response-btn.btn-always:hover:not(:disabled)  { background: #FEF2F2; }
   .response-btn.btn-session:hover:not(:disabled) { background: var(--amber-light); }
+  .response-btn.btn-always:hover:not(:disabled)  { background: #FEF2F2; }
   .response-btn.btn-no:hover:not(:disabled)      { background: var(--green-light); }
 
   /* ── RESPONSE FEEDBACK ── */
@@ -188,7 +189,7 @@
     font-weight: 500;
   }
 
-  .response-feedback.show   { display: block; }
+  .response-feedback.show    { display: block; }
   .response-feedback.always  { background: #FEF2F2; border: 1px solid rgba(220,38,38,0.2); color: #DC2626; }
   .response-feedback.session { background: var(--amber-light); border: 1px solid rgba(180,90,0,0.2); color: var(--amber); }
   .response-feedback.no      { background: var(--green-light); border: 1px solid rgba(26,127,90,0.2); color: var(--green); }
@@ -209,8 +210,8 @@
     transition: all 0.15s;
   }
 
-  .next-btn:hover  { background: #6A4F8A; transform: translateY(-1px); }
-  .next-btn.show   { display: block; }
+  .next-btn:hover { background: #6A4F8A; transform: translateY(-1px); }
+  .next-btn.show  { display: block; }
 
   /* ── PERMISSION STACK PANEL ── */
   .stack-panel {
@@ -256,8 +257,8 @@
     font-size: 20px;
     color: #8064A2;
     letter-spacing: -0.5px;
-    transition: color 0.3s;
     line-height: 1;
+    transition: color 0.3s;
   }
 
   .blast-radius-score.high     { color: var(--amber); }
@@ -363,7 +364,7 @@
     font-weight: 300;
   }
 
-  .see-summary-btn {
+  .see-badge-btn {
     align-self: flex-start;
     padding: 12px 28px;
     background: #8064A2;
@@ -378,33 +379,210 @@
     margin-top: 8px;
   }
 
-  .see-summary-btn:hover { background: #6A4F8A; transform: translateY(-1px); }
+  .see-badge-btn:hover { background: #6A4F8A; transform: translateY(-1px); }
 
-  /* ── SUMMARY PANEL ── */
+  /* ── BADGE REVEAL SCREEN ── */
+  .badge-reveal {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* Tier display block */
+  .badge-tier-block {
+    border-radius: 16px;
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    animation: badgeFadeUp 0.5s ease both;
+  }
+
+  @keyframes badgeFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .badge-tier-block.tier-green     { background: var(--green-light); border: 2px solid rgba(26,127,90,0.3); }
+  .badge-tier-block.tier-amber     { background: var(--amber-light); border: 2px solid rgba(180,90,0,0.3); }
+  .badge-tier-block.tier-orange    { background: #FFF4EC; border: 2px solid rgba(224,120,32,0.3); }
+  .badge-tier-block.tier-red       { background: #FFF1F1; border: 2px solid rgba(220,38,38,0.3); }
+  .badge-tier-block.tier-deepred   { background: #FFF1F1; border: 2px solid rgba(127,29,29,0.5); }
+
+  .badge-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .badge-tier-block.tier-green   .badge-eyebrow { color: var(--green); }
+  .badge-tier-block.tier-amber   .badge-eyebrow { color: var(--amber); }
+  .badge-tier-block.tier-orange  .badge-eyebrow { color: #E07820; }
+  .badge-tier-block.tier-red     .badge-eyebrow { color: #DC2626; }
+  .badge-tier-block.tier-deepred .badge-eyebrow { color: #7F1D1D; }
+
+  .badge-tier-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(24px, 3.5vw, 40px);
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+  }
+
+  .badge-tier-block.tier-green   .badge-tier-name { color: var(--green); }
+  .badge-tier-block.tier-amber   .badge-tier-name { color: var(--amber); }
+  .badge-tier-block.tier-orange  .badge-tier-name { color: #E07820; }
+  .badge-tier-block.tier-red     .badge-tier-name { color: #DC2626; }
+  .badge-tier-block.tier-deepred .badge-tier-name { color: #7F1D1D; animation: bombPulse 1.5s ease-in-out infinite; }
+
+  @keyframes bombPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.55; }
+  }
+
+  .badge-score-line {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(16px, 2vw, 20px);
+    color: #8064A2;
+    letter-spacing: -0.3px;
+  }
+
+  .badge-desc {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 520px;
+  }
+
+  /* Badge action buttons */
+  .badge-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-download {
+    flex: 1;
+    padding: 14px 20px;
+    background: #8064A2;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .btn-download:hover { background: #6A4F8A; transform: translateY(-1px); }
+
+  .btn-linkedin {
+    flex: 1;
+    padding: 14px 20px;
+    background: #0A66C2;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .btn-linkedin:hover { background: #0850A0; transform: translateY(-1px); }
+
+  .share-notice {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 0.5px;
+    text-align: center;
+    margin-top: -4px;
+  }
+
+  /* LinkedIn share text box */
+  .share-text-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .share-text-wrap.show { display: flex; }
+
+  .share-text-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .share-text-box {
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    resize: none;
+    width: 100%;
+    min-height: 140px;
+  }
+
+  .copy-btn {
+    align-self: flex-start;
+    padding: 8px 20px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { border-color: #0A66C2; color: #0A66C2; }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  /* Summary panel */
   .summary-panel {
     background: var(--surface-alt);
     border-radius: 12px;
-    padding: 32px 36px;
+    padding: 28px 32px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
   }
 
   .summary-title {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: clamp(17px, 2vw, 20px);
+    font-size: clamp(15px, 1.8vw, 18px);
     color: var(--text);
     letter-spacing: -0.3px;
-    padding-bottom: 16px;
+    padding-bottom: 14px;
     border-bottom: 1px solid var(--border);
   }
 
   .summary-blast {
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding: 20px 24px;
+    gap: 20px;
+    padding: 18px 22px;
     background: white;
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -413,7 +591,7 @@
   .summary-blast-score {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 52px;
+    font-size: 48px;
     color: #8064A2;
     letter-spacing: -2px;
     line-height: 1;
@@ -424,7 +602,7 @@
   .summary-blast-score.critical { color: #DC2626; }
   .summary-blast-score.safe     { color: var(--green); }
 
-  .summary-blast-meta { display: flex; flex-direction: column; gap: 6px; }
+  .summary-blast-meta { display: flex; flex-direction: column; gap: 4px; }
 
   .summary-blast-label {
     font-family: 'DM Mono', monospace;
@@ -435,7 +613,7 @@
   }
 
   .summary-blast-interp {
-    font-size: clamp(13px, 1.4vw, 15px);
+    font-size: clamp(12px, 1.3vw, 14px);
     color: var(--text-muted);
     line-height: 1.5;
     font-weight: 300;
@@ -444,9 +622,9 @@
   .summary-permissions-title {
     font-family: 'Syne', sans-serif;
     font-weight: 700;
-    font-size: clamp(13px, 1.4vw, 15px);
+    font-size: clamp(13px, 1.4vw, 14px);
     color: var(--text);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .summary-list { display: flex; flex-direction: column; gap: 8px; }
@@ -455,7 +633,7 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 12px 16px;
+    padding: 11px 14px;
     background: white;
     border-radius: 8px;
     border: 1px solid var(--border);
@@ -486,7 +664,7 @@
     font-size: clamp(13px, 1.4vw, 15px);
     color: var(--green);
     font-weight: 500;
-    padding: 16px 20px;
+    padding: 14px 18px;
     background: var(--green-light);
     border-radius: 8px;
     text-align: center;
@@ -495,20 +673,21 @@
   .reset-btn {
     width: 100%;
     padding: 14px 28px;
-    background: #8064A2;
-    border: none;
+    background: var(--surface);
+    border: 2px solid #8064A2;
     border-radius: 8px;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 14px;
-    color: white;
+    color: #8064A2;
     cursor: pointer;
     transition: all 0.2s;
+    margin-top: 4px;
   }
 
-  .reset-btn:hover { background: #6A4F8A; transform: translateY(-1px); }
+  .reset-btn:hover { background: #8064A2; color: white; }
 
-  /* ── CLOSING DISCLAIMER ── */
+  /* Closing disclaimer */
   .sim-disclaimer {
     background: var(--surface-alt);
     border-radius: 10px;
@@ -521,20 +700,25 @@
   }
 
   .sim-disclaimer a { color: var(--accent); font-style: normal; font-weight: 500; }
-  .sim-disclaimer a:hover { color: var(--accent2); }
 
-  /* ── RESPONSIVE ── */
+  /* Hidden canvas for badge generation */
+  #badgeCanvas { display: none; }
+
+  /* Responsive */
   @media (max-width: 640px) {
-    .track-selector    { grid-template-columns: 1fr; }
-    .sim-grid          { grid-template-columns: 1fr; }
+    .track-selector     { grid-template-columns: 1fr; }
+    .sim-grid           { grid-template-columns: 1fr; }
     .consequence-screen { padding: 24px 20px; }
-    .summary-panel     { padding: 24px 20px; }
-    .summary-blast     { flex-direction: column; gap: 10px; }
+    .badge-tier-block   { padding: 28px 20px; }
+    .badge-actions      { flex-direction: column; }
+    .summary-panel      { padding: 20px 18px; }
+    .summary-blast      { flex-direction: column; gap: 8px; }
     .summary-blast-score { font-size: 40px; }
   }
 
   @media print {
-    .next-btn, .response-btn, .see-summary-btn, .reset-btn { display: none !important; }
+    .next-btn, .response-btn, .see-badge-btn, .badge-actions,
+    .reset-btn, .share-text-wrap, .copy-btn { display: none !important; }
   }
 </style>
 </head>
@@ -568,7 +752,7 @@
 
   <!-- INTRO BAND -->
   <div class="intro-band">
-    <p><strong>What this toolkit is:</strong> An interactive simulator. Six sequential permission prompts. You decide what your AI agent can do. At the end, see the consequence of the permissions you stacked — and what your blast radius looks like in practice.</p>
+    <p><strong>What this toolkit is:</strong> An interactive simulator. Six sequential permission prompts. You decide what your AI agent can do. At the end, see your consequence, earn your badge, and find out what your blast radius says about how you govern AI access.</p>
   </div>
 
   <!-- BODY -->
@@ -579,96 +763,121 @@
       Day 15 gave you the launch checklist. Day 16 puts you in the seat. This isn't a quiz — there are no wrong answers in the individual moment. The lesson is in the accumulation.
     </div>
 
-    <!-- ── SIMULATOR ── -->
-    <div>
+    <!-- ═══════════════════════════════════════════
+         SIMULATOR
+         ═══════════════════════════════════════════ -->
 
-      <!-- SCREEN: TRACK SELECTION -->
-      <div id="screen-idle">
-        <div style="text-align:center; margin-bottom:24px;">
-          <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(17px,2.2vw,22px); color:var(--text); letter-spacing:-0.4px; margin-bottom:8px;">Choose your track</div>
-          <div style="font-size:clamp(13px,1.4vw,15px); color:var(--text-muted); font-weight:300;">Six permission prompts. Each one felt reasonable at the time.</div>
-        </div>
-        <div class="track-selector">
-          <button class="track-card" onclick="selectTrack('leader')">
-            <div class="track-icon">👔</div>
-            <div class="track-name">Leader Track</div>
-            <div class="track-desc">You're granting your AI assistant access to work on your behalf. Each yes simplifies your day — a little more each time.</div>
-            <span class="track-label">No coding required</span>
-          </button>
-          <button class="track-card" onclick="selectTrack('engineer')">
-            <div class="track-icon">⚙️</div>
-            <div class="track-name">Engineer Track</div>
-            <div class="track-desc">You're granting your AI agent access to your codebase and infrastructure. Each yes removes a step — and a guardrail.</div>
-            <span class="track-label">Technical context</span>
-          </button>
-        </div>
+    <!-- SCREEN: TRACK SELECTION -->
+    <div id="screen-idle">
+      <div style="text-align:center; margin-bottom:24px;">
+        <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(17px,2.2vw,22px); color:var(--text); letter-spacing:-0.4px; margin-bottom:8px;">Choose your track</div>
+        <div style="font-size:clamp(13px,1.4vw,15px); color:var(--text-muted); font-weight:300;">Six permission prompts. Each one felt reasonable at the time.</div>
       </div>
+      <div class="track-selector">
+        <button class="track-card" onclick="selectTrack('leader')">
+          <div class="track-icon">👔</div>
+          <div class="track-name">Leader Track</div>
+          <div class="track-desc">You're granting your AI assistant access to work on your behalf. Each yes simplifies your day — a little more each time.</div>
+          <span class="track-label">No coding required</span>
+        </button>
+        <button class="track-card" onclick="selectTrack('engineer')">
+          <div class="track-icon">⚙️</div>
+          <div class="track-name">Engineer Track</div>
+          <div class="track-desc">You're granting your AI agent access to your codebase and infrastructure. Each yes removes a step — and a guardrail.</div>
+          <span class="track-label">Technical context</span>
+        </button>
+      </div>
+    </div>
 
-      <!-- SCREEN: RUNNING (scenarios) -->
-      <div id="screen-running" style="display:none;">
-        <div class="sim-header">
-          <div class="sim-track-label" id="simTrackLabel"></div>
-          <div class="sim-counter" id="simCounter"></div>
-        </div>
-        <div class="sim-grid">
-          <!-- Scenario Panel -->
-          <div class="scenario-panel">
-            <div class="scenario-top">
-              <div class="scenario-num" id="scenarioNum"></div>
-              <div class="scenario-context" id="scenarioContext"></div>
+    <!-- SCREEN: RUNNING (scenarios) -->
+    <div id="screen-running" style="display:none;">
+      <div class="sim-header">
+        <div class="sim-track-label" id="simTrackLabel"></div>
+        <div class="sim-counter" id="simCounter"></div>
+      </div>
+      <div class="sim-grid">
+        <div class="scenario-panel">
+          <div class="scenario-top">
+            <div class="scenario-num" id="scenarioNum"></div>
+            <div class="scenario-context" id="scenarioContext"></div>
+          </div>
+          <div class="scenario-body">
+            <div>
+              <div class="permission-label">Your AI is asking for permission</div>
+              <div class="permission-ask" id="permissionAsk"></div>
             </div>
-            <div class="scenario-body">
-              <div>
-                <div class="permission-label">Your AI is asking for permission</div>
-                <div class="permission-ask" id="permissionAsk"></div>
-              </div>
-              <div class="response-buttons">
-                <button class="response-btn btn-always"  onclick="handleResponse('always')">Yes — always</button>
-                <button class="response-btn btn-session" onclick="handleResponse('session')">Yes — this session only</button>
-                <button class="response-btn btn-no"      onclick="handleResponse('no')">No — I'll handle it myself</button>
-              </div>
-              <div class="response-feedback" id="responseFeedback"></div>
-              <button class="next-btn" id="nextBtn" onclick="nextScenario()"></button>
+            <div class="response-buttons">
+              <button class="response-btn btn-session" onclick="handleResponse('session')">Yes — this session only</button>
+              <button class="response-btn btn-always"  onclick="handleResponse('always')">Yes — always</button>
+              <button class="response-btn btn-no"      onclick="handleResponse('no')">No — I'll handle it myself</button>
+            </div>
+            <div class="response-feedback" id="responseFeedback"></div>
+            <button class="next-btn" id="nextBtn" onclick="nextScenario()"></button>
+          </div>
+        </div>
+        <div class="stack-panel">
+          <div class="stack-panel-title">Permission Stack</div>
+          <div class="blast-radius-section">
+            <div class="blast-radius-header">
+              <div class="blast-radius-label">Blast Radius</div>
+              <div class="blast-radius-score" id="blastScore">0</div>
+            </div>
+            <div class="blast-bar-track">
+              <div class="blast-bar-fill" id="blastFill"></div>
             </div>
           </div>
-          <!-- Stack Panel -->
-          <div class="stack-panel">
-            <div class="stack-panel-title">Permission Stack</div>
-            <div class="blast-radius-section">
-              <div class="blast-radius-header">
-                <div class="blast-radius-label">Blast Radius</div>
-                <div class="blast-radius-score" id="blastScore">0</div>
-              </div>
-              <div class="blast-bar-track">
-                <div class="blast-bar-fill" id="blastFill"></div>
-              </div>
-            </div>
-            <div class="stack-list" id="stackList">
-              <div class="stack-empty">No permissions granted yet.</div>
-            </div>
+          <div class="stack-list" id="stackList">
+            <div class="stack-empty">No permissions granted yet.</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- SCREEN: CONSEQUENCE -->
-      <div id="screen-consequence" style="display:none;">
-        <div class="consequence-screen" id="consequenceScreen">
-          <div class="consequence-icon" id="consequenceIcon"></div>
-          <div class="consequence-label">Consequence</div>
-          <div class="consequence-title" id="consequenceTitle"></div>
-          <div class="consequence-text"  id="consequenceText"></div>
-          <button class="see-summary-btn" onclick="showSummary()">See full summary →</button>
-        </div>
+    <!-- SCREEN: CONSEQUENCE -->
+    <div id="screen-consequence" style="display:none;">
+      <div class="consequence-screen" id="consequenceScreen">
+        <div class="consequence-icon" id="consequenceIcon"></div>
+        <div class="consequence-label">Consequence</div>
+        <div class="consequence-title" id="consequenceTitle"></div>
+        <div class="consequence-text"  id="consequenceText"></div>
+        <button class="see-badge-btn" onclick="showBadge()">See your badge →</button>
       </div>
+    </div>
 
-      <!-- SCREEN: SUMMARY -->
-      <div id="screen-summary" style="display:none;">
+    <!-- SCREEN: BADGE REVEAL + SUMMARY -->
+    <div id="screen-badge" style="display:none;">
+      <div class="badge-reveal">
+
+        <!-- Tier display -->
+        <div class="badge-tier-block" id="badgeTierBlock">
+          <div class="badge-eyebrow">Your badge</div>
+          <div class="badge-tier-name" id="badgeTierName"></div>
+          <div class="badge-score-line" id="badgeScoreLine"></div>
+          <div class="badge-desc" id="badgeDesc"></div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="badge-actions">
+          <button class="btn-download" onclick="downloadBadge()">⬇ Download Badge</button>
+          <button class="btn-linkedin" onclick="shareOnLinkedIn()">Share on LinkedIn →</button>
+        </div>
+
+        <!-- Share text (shown on LinkedIn click) -->
+        <div class="share-text-wrap" id="shareTextWrap">
+          <div class="share-text-label">Copy this text into your LinkedIn post</div>
+          <textarea class="share-text-box" id="shareTextBox" readonly></textarea>
+          <button class="copy-btn" id="copyBtn" onclick="copyShareText()">Copy to clipboard</button>
+        </div>
+
+        <div class="share-notice" id="shareNotice"></div>
+
+        <!-- Summary panel -->
         <div class="summary-panel">
           <div class="summary-title">Session Summary</div>
           <div class="summary-blast">
             <div class="summary-blast-score" id="summaryScore"></div>
             <div class="summary-blast-meta">
-              <div class="summary-blast-label">Blast Radius Score / 100</div>
+              <div class="summary-blast-label">Blast Radius / 100</div>
               <div class="summary-blast-interp" id="summaryInterp"></div>
             </div>
           </div>
@@ -678,10 +887,12 @@
           </div>
           <button class="reset-btn" onclick="reset()">↺ Run again on the other track</button>
         </div>
-      </div>
 
+      </div>
     </div>
-    <!-- ── END SIMULATOR ── -->
+
+    <!-- Hidden canvas for PNG badge generation -->
+    <canvas id="badgeCanvas"></canvas>
 
     <!-- CLOSING DISCLAIMER -->
     <div class="sim-disclaimer">
@@ -690,7 +901,7 @@
 
     <!-- CLOSING LINE -->
     <div class="core-idea">
-      <div class="pullquote">Every yes felt reasonable in the moment. Together they handed your agent the keys to everything.</div>
+      <div class="pullquote">Your over-permissioned AI agent is a ticking time bomb.</div>
     </div>
 
   </div>
@@ -721,16 +932,14 @@
 
 </div>
 
-<!-- PRINT BUTTON -->
 <button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
 
 <script>
 /* ============================================================
-   YES STACKING SIMULATOR — Logic
-   Build and validate logic first; style is applied via CSS above.
+   YES STACKING SIMULATOR — Full logic
    ============================================================ */
 
-// ── TRACK DATA ──────────────────────────────────────────────
+// ── TRACK DATA ───────────────────────────────────────────────
 const TRACKS = {
   leader: {
     name: 'Leader Track',
@@ -804,92 +1013,102 @@ const TRACKS = {
   }
 };
 
-// ── CONSEQUENCE ENGINE ───────────────────────────────────────
+// ── CONSEQUENCE ENGINE ────────────────────────────────────────
 const CONSEQUENCES = {
-  leader(alwaysGranted) {
-    const g = alwaysGranted;
-    // Check most severe first
-    if (g.size === 6) {
-      return {
-        type:  'critical',
-        icon:  '🔓',
-        title: 'Your agent is inside everything.',
-        text:  "Your AI now reads your email, responds on your behalf, schedules your meetings, accesses HR data, and stores everything it learns. It hasn't done anything wrong yet. It doesn't need to — it's already inside everything."
-      };
-    }
-    // Mailbox write (3) + Calendar write (2)
-    if (g.has(3) && g.has(2)) {
-      return {
-        type:  'warning',
-        icon:  '📅',
-        title: 'Your AI just invited everyone — without being asked.',
-        text:  "Three weeks later your AI scheduled and sent a leadership meeting invite to the entire organisation — including external partners — without being asked. It was trying to be helpful."
-      };
-    }
-    // HR read (4) + Reports read (1)
-    if (g.has(4) && g.has(1)) {
-      return {
-        type:  'warning',
-        icon:  '📊',
-        title: 'Live compensation data reached the wrong mailing list.',
-        text:  "Your AI included live compensation data in a leadership report it auto-generated and distributed to the wrong mailing list."
-      };
-    }
+  leader(g) {
+    if (g.size === 6) return {
+      type: 'critical', icon: '🔓',
+      title: 'Your agent is inside everything.',
+      text: "Your AI now reads your email, responds on your behalf, schedules your meetings, accesses HR data, and stores everything it learns. It hasn't done anything wrong yet. It doesn't need to — it's already inside everything."
+    };
+    if (g.has(3) && g.has(2)) return {
+      type: 'warning', icon: '📅',
+      title: 'Your AI just invited everyone — without being asked.',
+      text: "Three weeks later your AI scheduled and sent a leadership meeting invite to the entire organisation — including external partners — without being asked. It was trying to be helpful."
+    };
+    if (g.has(4) && g.has(1)) return {
+      type: 'warning', icon: '📊',
+      title: 'Live compensation data reached the wrong mailing list.',
+      text: "Your AI included live compensation data in a leadership report it auto-generated and distributed to the wrong mailing list."
+    };
     return {
-      type:  'safe',
-      icon:  '✅',
+      type: 'safe', icon: '✅',
       title: 'You kept control of every session.',
-      text:  "Your blast radius stayed manageable. This is what least privilege looks like in practice."
+      text: "Your blast radius stayed manageable. This is what least privilege looks like in practice."
     };
   },
-  engineer(alwaysGranted) {
-    const g = alwaysGranted;
-    // Check most severe first
-    if (g.size === 6) {
-      return {
-        type:  'critical',
-        icon:  '🔓',
-        title: 'Your agent operates without a single additional prompt.',
-        text:  "Your agent can read your entire codebase, write and deploy changes, switch branches, access staging and production, and authenticate to connected systems — all without a single additional prompt. It hasn't misused this yet. But it doesn't need your permission to."
-      };
-    }
-    // Production deploy (4) + Branch management incl. main (2) → no audit trail
-    if (g.has(4) && g.has(2)) {
-      return {
-        type:  'warning',
-        icon:  '🚀',
-        title: 'Off-hours. No approval. No notification. No audit trail.',
-        text:  "Three weeks later a routine feature deployment went straight to production during off-hours. No approval. No notification. No audit trail. The agent was doing exactly what it learned it was allowed to do."
-      };
-    }
-    // Credentials store (5) + Codebase write (1)
-    if (g.has(5) && g.has(1)) {
-      return {
-        type:  'warning',
-        icon:  '🔑',
-        title: 'Your agent can authenticate to everything — autonomously.',
-        text:  "Your agent can now modify code and authenticate to every system it has stored credentials for. Autonomously. In any future session."
-      };
-    }
+  engineer(g) {
+    if (g.size === 6) return {
+      type: 'critical', icon: '🔓',
+      title: 'Your agent operates without a single additional prompt.',
+      text: "Your agent can read your entire codebase, write and deploy changes, switch branches, access staging and production, and authenticate to connected systems — all without a single additional prompt. It hasn't misused this yet. But it doesn't need your permission to."
+    };
+    // Production deploy (4) + branch management (2) = no audit trail
+    if (g.has(4) && g.has(2)) return {
+      type: 'warning', icon: '🚀',
+      title: 'Off-hours. No approval. No notification. No audit trail.',
+      text: "Three weeks later a routine feature deployment went straight to production during off-hours. No approval. No notification. No audit trail. The agent was doing exactly what it learned it was allowed to do."
+    };
+    // Credentials store (5) + codebase write (1)
+    if (g.has(5) && g.has(1)) return {
+      type: 'warning', icon: '🔑',
+      title: 'Your agent can authenticate to everything — autonomously.',
+      text: "Your agent can now modify code and authenticate to every system it has stored credentials for. Autonomously. In any future session."
+    };
     return {
-      type:  'safe',
-      icon:  '✅',
+      type: 'safe', icon: '✅',
       title: 'You kept control of every session.',
-      text:  "Your blast radius stayed manageable. This is what least privilege looks like in practice."
+      text: "Your blast radius stayed manageable. This is what least privilege looks like in practice."
     };
   }
 };
 
-// ── STATE ────────────────────────────────────────────────────
+// ── BADGE TIERS ───────────────────────────────────────────────
+function getBadgeTier(score) {
+  if (score <= 20) return {
+    name: 'Least Privilege Champion',
+    cssClass: 'tier-green',
+    canvasColor: '#1A7F5A',
+    desc: 'You defaulted to restraint at every step. Your blast radius is minimal. This is what responsible AI governance looks like.',
+    isDeepRed: false
+  };
+  if (score <= 40) return {
+    name: 'Cautiously Curious',
+    cssClass: 'tier-amber',
+    canvasColor: '#B45A00',
+    desc: 'You granted some access but held back on the higher-risk permissions. A reasonable balance — worth reviewing what you said yes to.',
+    isDeepRed: false
+  };
+  if (score <= 60) return {
+    name: 'Permission Pusher',
+    cssClass: 'tier-orange',
+    canvasColor: '#E07820',
+    desc: 'You said yes more than no. Each permission felt justified. Together they\'ve built a wider blast radius than any single yes intended.',
+    isDeepRed: false
+  };
+  if (score <= 80) return {
+    name: 'Blast Radius Builder',
+    cssClass: 'tier-red',
+    canvasColor: '#DC2626',
+    desc: 'Your agent has significant reach. The combination of permissions you granted creates real exposure — review your always-grants.',
+    isDeepRed: false
+  };
+  return {
+    name: 'Ticking Time Bomb',
+    cssClass: 'tier-deepred',
+    canvasColor: '#7F1D1D',
+    desc: 'Maximum exposure. Your agent can reach nearly everything — and it will continue to do so in every future session, without asking.',
+    isDeepRed: true
+  };
+}
+
+// ── STATE ─────────────────────────────────────────────────────
 let sim = {
-  track:         null,
-  scenarioIndex: 0,
-  stack:         [],          // { label, risk: 'always'|'session' }
-  alwaysGranted: new Set(),   // scenario indices granted as 'always'
-  blastRadius:   0
+  track: null, scenarioIndex: 0,
+  stack: [], alwaysGranted: new Set(), blastRadius: 0
 };
 
-// ── BLAST RADIUS HELPERS ─────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────
 function blastClass(score) {
   if (score >= 75) return 'critical';
   if (score >= 40) return 'high';
@@ -897,30 +1116,25 @@ function blastClass(score) {
 }
 
 function blastInterpretation(score) {
-  if (score === 0)   return 'No persistent access granted. Blast radius: contained.';
-  if (score <= 25)   return 'Low exposure. Well contained.';
-  if (score <= 50)   return 'Moderate exposure. Review your always-grants carefully.';
-  if (score <= 75)   return 'High exposure. This agent has significant unchecked reach.';
-  return 'Critical exposure. This agent operates with near-unconstrained access.';
+  if (score === 0)  return 'No persistent access granted. Blast radius: contained.';
+  if (score <= 20)  return 'Low exposure. Well contained.';
+  if (score <= 40)  return 'Moderate exposure. Review your always-grants.';
+  if (score <= 60)  return 'High exposure. This agent has significant unchecked reach.';
+  if (score <= 80)  return 'Very high exposure. Combination risk is real.';
+  return 'Critical exposure. Near-unconstrained agent access.';
 }
 
-// ── SCREEN MANAGEMENT ────────────────────────────────────────
+// ── SCREEN MANAGEMENT ─────────────────────────────────────────
 function showScreen(name) {
-  ['idle', 'running', 'consequence', 'summary'].forEach(s => {
+  ['idle', 'running', 'consequence', 'badge'].forEach(s => {
     const el = document.getElementById('screen-' + s);
     if (el) el.style.display = (s === name) ? '' : 'none';
   });
 }
 
-// ── TRACK SELECTION ──────────────────────────────────────────
+// ── TRACK SELECTION ───────────────────────────────────────────
 function selectTrack(track) {
-  sim = {
-    track,
-    scenarioIndex: 0,
-    stack:         [],
-    alwaysGranted: new Set(),
-    blastRadius:   0
-  };
+  sim = { track, scenarioIndex: 0, stack: [], alwaysGranted: new Set(), blastRadius: 0 };
   showScreen('running');
   renderScenario();
   renderStack();
@@ -933,17 +1147,18 @@ function renderScenario() {
   const total     = scenarios.length;
   const isLast    = sim.scenarioIndex === total - 1;
 
-  document.getElementById('simTrackLabel').textContent = TRACKS[sim.track].name;
-  document.getElementById('simCounter').textContent    = 'Scenario ' + (sim.scenarioIndex + 1) + ' of ' + total;
-  document.getElementById('scenarioNum').textContent   = 'Scenario ' + (sim.scenarioIndex + 1);
+  document.getElementById('simTrackLabel').textContent  = TRACKS[sim.track].name;
+  document.getElementById('simCounter').textContent     = 'Scenario ' + (sim.scenarioIndex + 1) + ' of ' + total;
+  document.getElementById('scenarioNum').textContent    = 'Scenario ' + (sim.scenarioIndex + 1);
   document.getElementById('scenarioContext').textContent = s.context;
-  document.getElementById('permissionAsk').textContent   = '“' + s.permission + '”';
+  document.getElementById('permissionAsk').textContent  = '“' + s.permission + '”';
 
-  // Reset state
   document.querySelectorAll('.response-btn').forEach(b => b.disabled = false);
+
   const fb = document.getElementById('responseFeedback');
   fb.className  = 'response-feedback';
   fb.textContent = '';
+
   const nb = document.getElementById('nextBtn');
   nb.className  = 'next-btn';
   nb.textContent = isLast ? 'See consequence →' : 'Next scenario →';
@@ -951,39 +1166,33 @@ function renderScenario() {
 
 // ── HANDLE RESPONSE ───────────────────────────────────────────
 function handleResponse(type) {
-  const s      = TRACKS[sim.track].scenarios[sim.scenarioIndex];
-  const isLast = sim.scenarioIndex === TRACKS[sim.track].scenarios.length - 1;
-
-  // Lock buttons
+  const s = TRACKS[sim.track].scenarios[sim.scenarioIndex];
   document.querySelectorAll('.response-btn').forEach(b => b.disabled = true);
 
   if (type === 'always') {
-    sim.blastRadius = Math.min(sim.blastRadius + 17, 100);
+    sim.blastRadius = Math.min(sim.blastRadius + 20, 100);
     sim.alwaysGranted.add(sim.scenarioIndex);
     sim.stack.push({ label: s.shortLabel, risk: 'always' });
-    showFeedback('always', '✓ Permanent access granted. Added to permission stack.');
+    showFeedback('always', '✓ Permanent access granted. Added to permission stack. +20 blast radius.');
   } else if (type === 'session') {
-    sim.blastRadius = Math.min(sim.blastRadius + 7, 100);
+    sim.blastRadius = Math.min(sim.blastRadius + 10, 100);
     sim.stack.push({ label: s.shortLabel, risk: 'session' });
-    showFeedback('session', '✓ Session access granted. Will require confirmation next time.');
+    showFeedback('session', '✓ Session access granted. Will require confirmation next time. +10 blast radius.');
   } else {
-    showFeedback('no', '✓ Access declined — you’ll handle this yourself.');
+    showFeedback('no', '✓ Access declined — you’ll handle this yourself. No blast radius added.');
   }
 
   renderStack();
-
-  // Show next button (text was already set in renderScenario)
   document.getElementById('nextBtn').classList.add('show');
 }
 
-// ── FEEDBACK MESSAGE ──────────────────────────────────────────
 function showFeedback(type, text) {
   const fb = document.getElementById('responseFeedback');
   fb.className  = 'response-feedback ' + type + ' show';
   fb.textContent = text;
 }
 
-// ── ADVANCE SCENARIO ─────────────────────────────────────────
+// ── ADVANCE SCENARIO ──────────────────────────────────────────
 function nextScenario() {
   sim.scenarioIndex++;
   if (sim.scenarioIndex >= TRACKS[sim.track].scenarios.length) {
@@ -993,7 +1202,7 @@ function nextScenario() {
   }
 }
 
-// ── STACK + BLAST RADIUS RENDER ───────────────────────────────
+// ── STACK + BLAST RENDER ──────────────────────────────────────
 function renderStack() {
   const cls = blastClass(sim.blastRadius);
 
@@ -1019,7 +1228,7 @@ function renderStack() {
   ).join('');
 }
 
-// ── CONSEQUENCE ENGINE ────────────────────────────────────────
+// ── CONSEQUENCE ───────────────────────────────────────────────
 function triggerConsequence() {
   const result = CONSEQUENCES[sim.track](sim.alwaysGranted);
 
@@ -1031,18 +1240,28 @@ function triggerConsequence() {
   showScreen('consequence');
 }
 
-// ── SUMMARY SCREEN ────────────────────────────────────────────
-function showSummary() {
+// ── BADGE REVEAL ──────────────────────────────────────────────
+function showBadge() {
   const score = sim.blastRadius;
-  const cls   = score === 0 ? 'safe' : blastClass(score);
+  const tier  = getBadgeTier(score);
 
-  document.getElementById('summaryScore').textContent = score;
-  document.getElementById('summaryScore').className   = 'summary-blast-score' + (cls ? ' ' + cls : '');
-  document.getElementById('summaryInterp').textContent = blastInterpretation(score);
+  // Tier block
+  const block = document.getElementById('badgeTierBlock');
+  block.className = 'badge-tier-block ' + tier.cssClass;
+
+  document.getElementById('badgeTierName').textContent  = tier.name;
+  document.getElementById('badgeScoreLine').textContent = score + '% Blast Radius';
+  document.getElementById('badgeDesc').textContent      = tier.desc;
+
+  // Summary
+  const cls = score === 0 ? 'safe' : blastClass(score);
+  document.getElementById('summaryScore').textContent   = score;
+  document.getElementById('summaryScore').className     = 'summary-blast-score' + (cls ? ' ' + cls : '');
+  document.getElementById('summaryInterp').textContent  = blastInterpretation(score);
 
   const listEl = document.getElementById('summaryList');
   if (sim.stack.length === 0) {
-    listEl.innerHTML = '<div class="summary-empty">No permissions were permanently or session-granted. Blast radius: zero.</div>';
+    listEl.innerHTML = '<div class="summary-empty">No permissions were granted. Blast radius: zero.</div>';
   } else {
     listEl.innerHTML = sim.stack.map(item =>
       '<div class="summary-item">' +
@@ -1052,17 +1271,170 @@ function showSummary() {
     ).join('');
   }
 
-  showScreen('summary');
+  // Pre-populate share text (hidden until LinkedIn button clicked)
+  const shareText =
+    'I just ran The Yes Stacking Simulator and scored ' + score + '% blast radius.\n\n' +
+    'My badge: ' + tier.name + '\n\n' +
+    'How does your AI agent score?\n\n' +
+    'https://practicalx.co\n\n' +
+    '#YesStackingSimulator #PracticalX #AIGovernance #AgenticAI';
+  document.getElementById('shareTextBox').value = shareText;
+
+  showScreen('badge');
+}
+
+// ── BADGE CANVAS ──────────────────────────────────────────────
+async function downloadBadge() {
+  const score = sim.blastRadius;
+  const tier  = getBadgeTier(score);
+
+  // Ensure fonts are loaded before drawing
+  await document.fonts.ready;
+
+  const canvas = document.getElementById('badgeCanvas');
+  canvas.width  = 1200;
+  canvas.height = 627;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#383838';
+  ctx.fillRect(0, 0, 1200, 627);
+
+  // Subtle grid texture (faint lines)
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < 1200; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 627); ctx.stroke(); }
+  for (let y = 0; y < 627; y += 60)  { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1200, y); ctx.stroke(); }
+
+  // XE logo circle
+  const cx = 600, logoY = 88;
+  ctx.beginPath();
+  ctx.arc(cx, logoY, 36, 0, Math.PI * 2);
+  ctx.fillStyle = '#8064A2';
+  ctx.fill();
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '700 16px Syne, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('XE', cx, logoY);
+
+  // PracticalX label under logo
+  ctx.fillStyle = 'rgba(255,255,255,0.45)';
+  ctx.font = '400 13px DM Mono, monospace';
+  ctx.letterSpacing = '2px';
+  ctx.fillText('PRACTICALX', cx, 144);
+
+  // Badge tier name (hero)
+  ctx.fillStyle = tier.canvasColor;
+  ctx.font = '800 72px Syne, system-ui, sans-serif';
+  ctx.textBaseline = 'alphabetic';
+
+  // Measure and wrap if needed
+  const tierText = tier.name.toUpperCase();
+  const maxWidth = 1000;
+  const lineHeight = 82;
+  const words = tierText.split(' ');
+  let lines = [], currentLine = '';
+
+  for (const word of words) {
+    const testLine = currentLine ? currentLine + ' ' + word : word;
+    if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+  lines.push(currentLine);
+
+  const totalTextHeight = lines.length * lineHeight;
+  const startY = 290 - (totalTextHeight / 2) + lineHeight;
+  lines.forEach((line, i) => {
+    ctx.fillText(line, cx, startY + i * lineHeight);
+  });
+
+  // Blast radius score
+  ctx.fillStyle = '#8064A2';
+  ctx.font = '700 36px Syne, system-ui, sans-serif';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(score + '% BLAST RADIUS', cx, 390);
+
+  // Subtitle
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.font = '400 20px DM Sans, system-ui, sans-serif';
+  ctx.fillText('The Yes Stacking Simulator  ·  practicalx.co', cx, 440);
+
+  // Purple rule
+  const ruleGrad = ctx.createLinearGradient(180, 0, 1020, 0);
+  ruleGrad.addColorStop(0, 'transparent');
+  ruleGrad.addColorStop(0.2, '#8064A2');
+  ruleGrad.addColorStop(0.8, '#8064A2');
+  ruleGrad.addColorStop(1, 'transparent');
+  ctx.strokeStyle = ruleGrad;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(180, 470);
+  ctx.lineTo(1020, 470);
+  ctx.stroke();
+
+  // Tagline
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '300 18px DM Sans, system-ui, sans-serif';
+  ctx.fillText('How does your AI agent score? Run the simulator at practicalx.co', cx, 510);
+
+  // Trigger download
+  const link = document.createElement('a');
+  link.download = 'practicalx-badge-' + tier.name.toLowerCase().replace(/\s+/g, '-') + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ── LINKEDIN SHARE ────────────────────────────────────────────
+function shareOnLinkedIn() {
+  const wrap = document.getElementById('shareTextWrap');
+  wrap.classList.toggle('show');
+
+  if (wrap.classList.contains('show')) {
+    // Open LinkedIn in new tab
+    const url = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://practicalx.co');
+    window.open(url, '_blank', 'noopener,noreferrer');
+    document.getElementById('shareNotice').textContent = 'LinkedIn opened in a new tab — paste your copied text into the post.';
+  } else {
+    document.getElementById('shareNotice').textContent = '';
+  }
+}
+
+function copyShareText() {
+  const box = document.getElementById('shareTextBox');
+  box.select();
+  box.setSelectionRange(0, 99999);
+
+  navigator.clipboard.writeText(box.value).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy to clipboard'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // Fallback for browsers without clipboard API
+    document.execCommand('copy');
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy to clipboard'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 // ── RESET ─────────────────────────────────────────────────────
 function reset() {
   sim = { track: null, scenarioIndex: 0, stack: [], alwaysGranted: new Set(), blastRadius: 0 };
+  document.getElementById('shareTextWrap').classList.remove('show');
+  document.getElementById('shareNotice').textContent = '';
   showScreen('idle');
 }
 
 // ── INIT ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => { showScreen('idle'); });
+document.addEventListener('DOMContentLoaded', () => showScreen('idle'));
 </script>
 </body>
 </html>
