@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 18 · The AI Model Governance Starter Kit</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+<style>
+  /* ── REPO TYPE CARDS ── */
+  .repo-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #383838;
+  }
+
+  .repo-card {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .repo-card:last-child { border-right: none; }
+
+  .repo-card-header {
+    background: #8064A2;
+    color: white;
+    padding: 18px 22px 14px;
+  }
+
+  .repo-card-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 5px;
+  }
+
+  .repo-card-name {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(16px, 1.8vw, 20px);
+    font-weight: 700;
+  }
+
+  .repo-card-body {
+    background: #383838;
+    color: #D8D8D8;
+    padding: 20px 22px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .repo-card-desc {
+    font-size: clamp(12px, 1.2vw, 14px);
+    line-height: 1.65;
+  }
+
+  .repo-card-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(128,100,162,0.9);
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .repo-key-principle {
+    background: #EDE9FA;
+    border: 1px solid rgba(91,63,191,0.18);
+    border-radius: 10px;
+    padding: 18px 24px;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--accent);
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 680px) {
+    .repo-cards { grid-template-columns: 1fr; }
+    .repo-card { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .repo-card:last-child { border-bottom: none; }
+  }
+
+  /* ── NAMING CONVENTION BUILDER ── */
+  .builder-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .builder-intro {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .formula-display {
+    background: #EDE9FA;
+    border: 1px solid rgba(128,100,162,0.2);
+    border-radius: 10px;
+    padding: 18px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(13px, 1.5vw, 16px);
+    color: #8064A2;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  .builder-fields {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+
+  .builder-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .builder-field label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .builder-field input {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    background: white;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .builder-field input:focus { border-color: #8064A2; }
+  .builder-field input::placeholder { color: var(--text-light); }
+
+  .builder-field .field-helper {
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.45;
+  }
+
+  /* ── LIVE PREVIEW ── */
+  .preview-area {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preview-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .preview-name {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(15px, 1.8vw, 20px);
+    font-weight: 500;
+    line-height: 1.4;
+    word-break: break-all;
+  }
+
+  .preview-filled { color: var(--text); }
+  .preview-empty  { color: #C0B8D0; }
+  .preview-sep    { color: #C0B8D0; }
+
+  /* ── GENERATE BUTTON ── */
+  .builder-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-generate {
+    padding: 11px 22px;
+    background: #8064A2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .btn-generate:hover { background: #6A5090; transform: translateY(-1px); }
+  .btn-generate:active { transform: translateY(0); }
+
+  /* ── GENERATED SET ── */
+  .generated-set {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .generated-set.visible { display: flex; }
+
+  .generated-set-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .generated-set-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .btn-copy-all {
+    padding: 6px 14px;
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-copy-all:hover { border-color: #8064A2; color: #8064A2; }
+  .btn-copy-all.copied { color: var(--green); border-color: rgba(26,127,90,0.3); background: var(--green-light); }
+
+  .generated-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .generated-row:last-child { border-bottom: none; }
+
+  .generated-role-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .badge-local   { background: var(--green-light);  color: var(--green); }
+  .badge-remote  { background: var(--amber-light);  color: var(--amber); }
+  .badge-virtual { background: var(--blue-light);   color: var(--blue); }
+
+  .generated-name {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text);
+    word-break: break-all;
+  }
+
+  /* ── QUICK START ── */
+  .quickstart-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .quickstart-heading {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .quickstart-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .qs-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .qs-card:hover {
+    background: #F0EAF8;
+    border-color: rgba(128,100,162,0.3);
+  }
+
+  .qs-card-label {
+    font-size: clamp(13px, 1.3vw, 14px);
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .qs-card-preview {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-light);
+  }
+
+  @media (max-width: 680px) {
+    .builder-fields { grid-template-columns: 1fr 1fr; }
+    .builder-fields .builder-field:last-child { grid-column: span 2; }
+  }
+
+  @media (max-width: 420px) {
+    .builder-fields { grid-template-columns: 1fr; }
+    .builder-fields .builder-field:last-child { grid-column: span 1; }
+  }
+
+  /* ── CHECKLIST (reuse Day 17 pattern) ── */
+  .gov-gate {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .gov-gate-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8064A2;
+    padding: 0 0 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .gov-check {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .gov-check.answered { border-color: var(--border-strong); }
+
+  .gov-check-text {
+    font-size: clamp(13px, 1.35vw, 15px);
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .gov-check-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .gov-btn {
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .gov-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+  .gov-btn.sel-yes     { background: var(--green-light);  border-color: rgba(26,127,90,0.3);  color: var(--green);  font-weight: 500; }
+  .gov-btn.sel-partial { background: var(--amber-light);  border-color: rgba(180,90,0,0.3);   color: var(--amber);  font-weight: 500; }
+  .gov-btn.sel-no      { background: var(--red-light);    border-color: rgba(155,28,28,0.3);  color: var(--red);    font-weight: 500; }
+
+  /* ── SCORE PANEL ── */
+  .score-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+  }
+
+  .score-panel-block { display: flex; flex-direction: column; gap: 4px; }
+
+  .score-panel-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .score-panel-value {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    color: #8064A2;
+    line-height: 1;
+  }
+
+  .score-panel-max   { font-size: clamp(14px, 1.5vw, 18px); color: var(--text-muted); font-weight: 400; }
+  .score-panel-ansd  { font-family: 'DM Mono', monospace; font-size: clamp(13px, 1.4vw, 16px); color: var(--text-muted); }
+
+  .gov-gates { display: flex; flex-direction: column; gap: 28px; }
+
+  /* ── SCORE RESULT ── */
+  .score-result {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px 32px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: white;
+    animation: fadeSlideIn 0.4s ease;
+  }
+
+  .score-result.visible { display: flex; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .score-result-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .score-result-tier {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(22px, 2.5vw, 28px);
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .score-result-score {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(13px, 1.3vw, 15px);
+    color: var(--text-muted);
+  }
+
+  .score-result-desc {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    line-height: 1.65;
+    font-weight: 300;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  .gov-disclaimer {
+    background: var(--accent-light);
+    border: 1px solid rgba(91,63,191,0.15);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-size: clamp(12px, 1.25vw, 14px);
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .gov-disclaimer a { color: var(--accent); font-weight: 500; }
+
+  .reset-btn {
+    align-self: flex-start;
+    padding: 10px 22px;
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover { border-color: #8064A2; color: #8064A2; }
+
+  /* ── JFROG REFERENCE ── */
+  .jfrog-reference {
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-light);
+    padding: 12px 0;
+    letter-spacing: 0.3px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- BACK NAV -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 18 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">The AI Model Governance<br>Starter Kit</div>
+    <div class="header-quote">We built a security gate for every software package. AI models deserve the same.</div>
+    <div class="header-arc">Arc 3 · AI and Security — Day 6 of 6 · Days 13–18 · Arc Closer</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p>AI models are the new third party dependency. The governance architecture that solved software supply chain risk already exists — it just hasn't been applied to models yet. This toolkit gives you the conceptual foundation, a naming convention builder, and a governance checklist to get started.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      Arc 3 closes here. Days 13–17 built the case: the threat model, the checklist, the gates. Day 18 gives you the architecture — and the tools to implement it.
+    </div>
+
+    <!-- SECTION 1: THE THREE REPOSITORY TYPES -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-purple">🗄️</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 1 of 3</div>
+          <div class="section-title" style="color:#8064A2;">The Three Repository Types</div>
+        </div>
+      </div>
+
+      <div class="repo-cards">
+
+        <div class="repo-card">
+          <div class="repo-card-header">
+            <div class="repo-card-num">Type 01</div>
+            <div class="repo-card-name">Local</div>
+          </div>
+          <div class="repo-card-body">
+            <div class="repo-card-desc">Stores artifacts produced internally or manually uploaded after vetting. Nothing lives here unless it has been reviewed and promoted.</div>
+            <div class="repo-card-tag">Think of it as: your internal shelf.</div>
+          </div>
+        </div>
+
+        <div class="repo-card">
+          <div class="repo-card-header">
+            <div class="repo-card-num">Type 02</div>
+            <div class="repo-card-name">Remote</div>
+          </div>
+          <div class="repo-card-body">
+            <div class="repo-card-desc">Proxies and caches an external upstream registry. Every request is scanned before it enters your environment.</div>
+            <div class="repo-card-tag">Think of it as: your security gate.</div>
+          </div>
+        </div>
+
+        <div class="repo-card">
+          <div class="repo-card-header">
+            <div class="repo-card-num">Type 03</div>
+            <div class="repo-card-name">Virtual</div>
+          </div>
+          <div class="repo-card-body">
+            <div class="repo-card-desc">Aggregates local and remote repositories behind a single URL. This is the only URL pipelines and developers should ever configure.</div>
+            <div class="repo-card-tag">Think of it as: the one door everyone uses.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="repo-key-principle">
+        For every package ecosystem or model source you onboard — you need all three.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 2: NAMING CONVENTION BUILDER -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-green">🔧</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 2 of 3</div>
+          <div class="section-title green">The Naming Convention Builder</div>
+        </div>
+      </div>
+
+      <div class="builder-wrap">
+
+        <div class="builder-intro">Governance at scale only works if the naming convention works. Build yours here.</div>
+
+        <!-- FORMULA DISPLAY -->
+        <div class="formula-display">
+          {org} — {scope} — {type} — {source} — {role}
+        </div>
+
+        <!-- INPUT FIELDS -->
+        <div class="builder-fields">
+          <div class="builder-field">
+            <label for="field-org">Organisation</label>
+            <input id="field-org" type="text" placeholder="e.g. acme" oninput="updatePreview()" autocomplete="off" spellcheck="false">
+            <span class="field-helper">Your org or team prefix — must be unique in a shared instance</span>
+          </div>
+          <div class="builder-field">
+            <label for="field-scope">Scope</label>
+            <input id="field-scope" type="text" placeholder="e.g. shared" oninput="updatePreview()" autocomplete="off" spellcheck="false">
+            <span class="field-helper">Shared across all teams, or specific to one application</span>
+          </div>
+          <div class="builder-field">
+            <label for="field-type">Type</label>
+            <input id="field-type" type="text" placeholder="e.g. pkg" oninput="updatePreview()" autocomplete="off" spellcheck="false">
+            <span class="field-helper">pkg for packages · aimodels for AI models</span>
+          </div>
+          <div class="builder-field">
+            <label for="field-source">Source</label>
+            <input id="field-source" type="text" placeholder="e.g. npm" oninput="updatePreview()" autocomplete="off" spellcheck="false">
+            <span class="field-helper">npm · pypi · nuget · docker · terraform · hf</span>
+          </div>
+          <div class="builder-field">
+            <label for="field-role">Role</label>
+            <input id="field-role" type="text" placeholder="e.g. virtual" oninput="updatePreview()" autocomplete="off" spellcheck="false">
+            <span class="field-helper">local · remote · virtual</span>
+          </div>
+        </div>
+
+        <!-- LIVE PREVIEW -->
+        <div class="preview-area">
+          <div class="preview-label">Live Preview</div>
+          <div class="preview-name" id="preview-name">
+            <span class="preview-empty">{org}</span><span class="preview-sep">-</span><span class="preview-empty">{scope}</span><span class="preview-sep">-</span><span class="preview-empty">{type}</span><span class="preview-sep">-</span><span class="preview-empty">{source}</span><span class="preview-sep">-</span><span class="preview-empty">{role}</span>
+          </div>
+        </div>
+
+        <!-- GENERATE BUTTON -->
+        <div class="builder-actions">
+          <button class="btn-generate no-print" onclick="generateFullSet()">Generate Full Set →</button>
+        </div>
+
+        <!-- GENERATED SET -->
+        <div class="generated-set" id="generated-set">
+          <div class="generated-set-header">
+            <div class="generated-set-label">Your Three Repositories</div>
+            <button class="btn-copy-all no-print" id="copy-all-btn" onclick="copyAll()">Copy All</button>
+          </div>
+          <div class="generated-row">
+            <span class="generated-role-badge badge-local">local</span>
+            <span class="generated-name" id="gen-local"></span>
+          </div>
+          <div class="generated-row">
+            <span class="generated-role-badge badge-remote">remote</span>
+            <span class="generated-name" id="gen-remote"></span>
+          </div>
+          <div class="generated-row">
+            <span class="generated-role-badge badge-virtual">virtual</span>
+            <span class="generated-name" id="gen-virtual"></span>
+          </div>
+        </div>
+
+        <!-- QUICK START EXAMPLES -->
+        <div class="quickstart-wrap">
+          <div class="quickstart-heading">Common combinations — click to pre-fill</div>
+          <div class="quickstart-cards">
+            <button class="qs-card no-print" onclick="prefill('shared','pkg','npm')">
+              <span class="qs-card-label">npm packages</span>
+              <span class="qs-card-preview">{org}-shared-pkg-npm-*</span>
+            </button>
+            <button class="qs-card no-print" onclick="prefill('shared','pkg','pypi')">
+              <span class="qs-card-label">Python / PyPI</span>
+              <span class="qs-card-preview">{org}-shared-pkg-pypi-*</span>
+            </button>
+            <button class="qs-card no-print" onclick="prefill('shared','pkg','docker')">
+              <span class="qs-card-label">Docker images</span>
+              <span class="qs-card-preview">{org}-shared-pkg-docker-*</span>
+            </button>
+            <button class="qs-card no-print" onclick="prefill('shared','aimodels','hf')">
+              <span class="qs-card-label">AI Models — Hugging Face</span>
+              <span class="qs-card-preview">{org}-shared-aimodels-hf-*</span>
+            </button>
+            <button class="qs-card no-print" onclick="prefill('shared','pkg','terraform')">
+              <span class="qs-card-label">Terraform modules</span>
+              <span class="qs-card-preview">{org}-shared-pkg-terraform-*</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 3: AI MODEL GOVERNANCE CHECKLIST -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-blue">📋</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 3 of 3</div>
+          <div class="section-title blue">The AI Model Governance Checklist</div>
+        </div>
+      </div>
+
+      <div class="builder-intro" style="margin-bottom: 8px;">Before any AI model enters your environment — run through this checklist.</div>
+
+      <!-- SCORE PANEL -->
+      <div class="score-panel">
+        <div class="score-panel-block">
+          <div class="score-panel-label">Current Score</div>
+          <div class="score-panel-value">
+            <span id="score-current">0</span><span class="score-panel-max"> / 24</span>
+          </div>
+        </div>
+        <div class="score-panel-block" style="text-align:right;">
+          <div class="score-panel-label">Answered</div>
+          <div class="score-panel-ansd" id="score-answered">0 / 12</div>
+        </div>
+      </div>
+
+      <div class="gov-gates">
+
+        <!-- GROUP 1: MODEL SOURCING -->
+        <div class="gov-gate">
+          <div class="gov-gate-label">Group 1 — Model Sourcing</div>
+
+          <div class="gov-check" data-idx="0">
+            <div class="gov-check-text">All models are sourced through a controlled proxy — not downloaded directly from the internet</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(0,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(0,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(0,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="gov-check" data-idx="1">
+            <div class="gov-check-text">Direct downloads from model repositories to developer machines are explicitly prohibited</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(1,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(1,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(1,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="gov-check" data-idx="2">
+            <div class="gov-check-text">Model weight files are banned from source control repositories</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(2,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(2,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(2,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- GROUP 2: SCANNING AND VALIDATION -->
+        <div class="gov-gate">
+          <div class="gov-gate-label">Group 2 — Scanning and Validation</div>
+
+          <div class="gov-check" data-idx="3">
+            <div class="gov-check-text">Security scanning is enabled on all model repositories</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(3,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(3,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(3,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="gov-check" data-idx="4">
+            <div class="gov-check-text">Any model flagged by scanning undergoes manual review before promotion to production</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(4,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(4,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(4,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="gov-check" data-idx="5">
+            <div class="gov-check-text">Licence compliance is checked for every model before use</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(5,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(5,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(5,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- GROUP 3: GOVERNANCE AND AUDIT -->
+        <div class="gov-gate">
+          <div class="gov-gate-label">Group 3 — Governance and Audit</div>
+
+          <div class="gov-check" data-idx="6">
+            <div class="gov-check-text">Every model repository has a named owner</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(6,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(6,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(6,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="gov-check" data-idx="7">
+            <div class="gov-check-text">An audit trail exists for every model download and promotion</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(7,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(7,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(7,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="gov-check" data-idx="8">
+            <div class="gov-check-text">A process exists for onboarding new model sources beyond the current approved list</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(8,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(8,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(8,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- GROUP 4: OPERATIONAL -->
+        <div class="gov-gate">
+          <div class="gov-gate-label">Group 4 — Operational</div>
+
+          <div class="gov-check" data-idx="9">
+            <div class="gov-check-text">Large models above a defined size threshold have an assessed storage and registry strategy</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(9,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(9,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(9,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="gov-check" data-idx="10">
+            <div class="gov-check-text">A decommission process exists for models no longer in use</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(10,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(10,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(10,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="gov-check" data-idx="11">
+            <div class="gov-check-text">The repository list and governance policy are reviewed at least annually</div>
+            <div class="gov-check-btns">
+              <button class="gov-btn" onclick="govRate(11,2,this,'yes')">✅ Yes</button>
+              <button class="gov-btn" onclick="govRate(11,1,this,'partial')">⚠️ Partial</button>
+              <button class="gov-btn" onclick="govRate(11,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /gov-gates -->
+
+      <!-- SCORE RESULT -->
+      <div class="score-result" id="score-result">
+        <div class="score-result-label">Your Result</div>
+        <div class="score-result-tier" id="result-tier"></div>
+        <div class="score-result-score" id="result-score"></div>
+        <div class="score-result-desc" id="result-desc"></div>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div class="gov-disclaimer" id="gov-disclaimer" style="display:none;">
+        This checklist is a starting point. Every organisation's model governance needs will vary based on scale, regulatory context, and model complexity. For a more comprehensive review — <a href="https://www.linkedin.com/in/karthikmahadevan06/" target="_blank" rel="noopener">connect with me on LinkedIn</a>.
+      </div>
+
+      <!-- RESET -->
+      <button class="reset-btn no-print" id="reset-btn" style="display:none;" onclick="resetChecklist()">Start Again</button>
+
+    </div><!-- /section -->
+
+    <div class="divider"></div>
+
+    <!-- CLOSING LINE -->
+    <div class="core-idea">
+      <div class="pullquote">The architecture exists. The tooling exists. The only thing missing is the decision to apply the same discipline to models that you applied to packages.</div>
+    </div>
+
+    <!-- JFROG REFERENCE -->
+    <div class="jfrog-reference">
+      Examples in this toolkit reference JFrog Artifactory as a practical implementation of the governance model described. Other artifact repository platforms are available.
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section no-print">
+    <div class="progress-header">
+      <div class="progress-label">Series Progress</div>
+      <div class="progress-count">Day 18 / 30</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 60%"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 18 OF 30 · ARC 3 · AI AND SECURITY · ARC CLOSER</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── NAMING CONVENTION BUILDER ── */
+
+  function getVal(id) {
+    var raw = document.getElementById(id).value.trim().toLowerCase();
+    return raw.replace(/\s+/g, '-');
+  }
+
+  window.updatePreview = function () {
+    var org    = getVal('field-org')    || null;
+    var scope  = getVal('field-scope')  || null;
+    var type   = getVal('field-type')   || null;
+    var source = getVal('field-source') || null;
+    var role   = getVal('field-role')   || null;
+
+    var vals   = [org, scope, type, source, role];
+    var labels = ['{org}', '{scope}', '{type}', '{source}', '{role}'];
+
+    var html = vals.map(function (v, i) {
+      var cls = v ? 'preview-filled' : 'preview-empty';
+      return '<span class="' + cls + '">' + (v || labels[i]) + '</span>';
+    }).join('<span class="preview-sep">-</span>');
+
+    document.getElementById('preview-name').innerHTML = html;
+  };
+
+  window.generateFullSet = function () {
+    var org    = getVal('field-org');
+    var scope  = getVal('field-scope');
+    var type   = getVal('field-type');
+    var source = getVal('field-source');
+
+    if (!org || !scope || !type || !source) {
+      var missing = [];
+      if (!org)    missing.push('Organisation');
+      if (!scope)  missing.push('Scope');
+      if (!type)   missing.push('Type');
+      if (!source) missing.push('Source');
+      alert('Please fill in: ' + missing.join(', '));
+      return;
+    }
+
+    var base = [org, scope, type, source].join('-');
+    window._generatedLines = [base + '-local', base + '-remote', base + '-virtual'];
+
+    document.getElementById('gen-local').textContent   = window._generatedLines[0];
+    document.getElementById('gen-remote').textContent  = window._generatedLines[1];
+    document.getElementById('gen-virtual').textContent = window._generatedLines[2];
+
+    var setEl = document.getElementById('generated-set');
+    setEl.classList.add('visible');
+    setEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Reset copy button
+    var copyBtn = document.getElementById('copy-all-btn');
+    copyBtn.textContent = 'Copy All';
+    copyBtn.classList.remove('copied');
+  };
+
+  window.copyAll = function () {
+    var lines = window._generatedLines;
+    if (!lines) return;
+
+    var text = lines.join('\n');
+    var btn  = document.getElementById('copy-all-btn');
+
+    function markCopied() {
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = 'Copy All';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(markCopied).catch(function () {
+        fallbackCopy(text, markCopied);
+      });
+    } else {
+      fallbackCopy(text, markCopied);
+    }
+  };
+
+  function fallbackCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity  = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); cb(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  window.prefill = function (scope, type, source) {
+    document.getElementById('field-scope').value  = scope;
+    document.getElementById('field-type').value   = type;
+    document.getElementById('field-source').value = source;
+    document.getElementById('field-role').value   = '';
+    updatePreview();
+    document.getElementById('field-org').focus();
+  };
+
+  /* ── GOVERNANCE CHECKLIST ── */
+
+  var TOTAL   = 12;
+  var answers = new Array(TOTAL).fill(null);
+
+  window.govRate = function (idx, pts, btn, tier) {
+    answers[idx] = pts;
+
+    var checkEl = document.querySelector('.gov-check[data-idx="' + idx + '"]');
+    checkEl.querySelectorAll('.gov-btn').forEach(function (b) {
+      b.classList.remove('sel-yes', 'sel-partial', 'sel-no');
+    });
+    btn.classList.add('sel-' + tier);
+    checkEl.classList.add('answered');
+
+    updateScore();
+  };
+
+  function updateScore() {
+    var answered = answers.filter(function (a) { return a !== null; }).length;
+    var score    = answers.reduce(function (sum, a) { return sum + (a !== null ? a : 0); }, 0);
+
+    document.getElementById('score-current').textContent  = score;
+    document.getElementById('score-answered').textContent = answered + ' / ' + TOTAL;
+
+    if (answered === TOTAL) { showResult(score); }
+  }
+
+  function showResult(score) {
+    var tier, desc, color;
+
+    if (score >= 22) {
+      tier  = 'Model Governance Leader';
+      desc  = 'Your model supply chain is production ready.';
+      color = 'var(--green)';
+    } else if (score >= 16) {
+      tier  = 'Progressing';
+      desc  = 'Strong foundations with gaps to close. Focus on the groups where you scored Partial.';
+      color = 'var(--amber)';
+    } else if (score >= 8) {
+      tier  = 'Developing';
+      desc  = 'Start with sourcing and scanning — they carry the highest risk.';
+      color = '#E07820';
+    } else {
+      tier  = 'Starting Out';
+      desc  = 'One remote repository proxying your model source is the first step.';
+      color = 'var(--red)';
+    }
+
+    var resultEl = document.getElementById('score-result');
+    document.getElementById('result-tier').textContent  = tier;
+    document.getElementById('result-tier').style.color  = color;
+    document.getElementById('result-score').textContent = 'Score: ' + score + ' / 24';
+    document.getElementById('result-desc').textContent  = desc;
+    resultEl.classList.add('visible');
+    resultEl.style.borderColor = color;
+
+    document.getElementById('gov-disclaimer').style.display = 'block';
+    document.getElementById('reset-btn').style.display      = 'block';
+
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  window.resetChecklist = function () {
+    answers.fill(null);
+
+    document.querySelectorAll('.gov-btn').forEach(function (b) {
+      b.classList.remove('sel-yes', 'sel-partial', 'sel-no');
+    });
+    document.querySelectorAll('.gov-check').forEach(function (c) {
+      c.classList.remove('answered');
+    });
+
+    document.getElementById('score-current').textContent  = '0';
+    document.getElementById('score-answered').textContent = '0 / ' + TOTAL;
+
+    var resultEl = document.getElementById('score-result');
+    resultEl.classList.remove('visible');
+    resultEl.style.borderColor = '';
+
+    document.getElementById('gov-disclaimer').style.display = 'none';
+    document.getElementById('reset-btn').style.display      = 'none';
+
+    window.scrollTo({ behavior: 'smooth', top: document.querySelector('.section:last-of-type').offsetTop });
+  };
+
+}());
+</script>
+
+</body>
+</html>
