@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Representing AI Agents in C4 — A Practical Approach Worth Considering · PracticalX Deep Dives</title>
+<meta name="description" content="C4 was designed for deterministic systems. AI agents are not deterministic. Here is a working model for bridging that gap.">
+<meta property="og:title" content="Representing AI Agents in C4 — A Practical Approach Worth Considering">
+<meta property="og:description" content="C4 was designed for deterministic systems. AI agents are not deterministic. Here is a working model for bridging that gap.">
+<meta property="og:url" content="https://www.practicalx.co/deep-dives/ai/c4-and-agentic-ai/">
+<meta property="og:type" content="article">
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/pages/deep-dive.css">
+<style>
+  /* ── BREADCRUMB ── */
+  .dd-breadcrumb {
+    max-width: var(--dd-wide-width);
+    margin: 0 auto;
+    padding: 20px 40px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .dd-breadcrumb a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--dd-text-light);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+
+  .dd-breadcrumb a:hover { color: var(--dd-accent); }
+
+  .dd-breadcrumb-sep {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--dd-text-light);
+    opacity: 0.5;
+  }
+
+  .dd-breadcrumb-current {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--dd-accent);
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 768px) {
+    .dd-breadcrumb { padding: 16px 24px 0; }
+  }
+</style>
+</head>
+<body class="deep-dive-page">
+
+<!-- READING PROGRESS BAR -->
+<div class="reading-progress" id="readingProgress"></div>
+
+<!-- STICKY NAV -->
+<nav class="dd-nav" id="ddNav" role="navigation">
+  <a href="/" class="dd-nav-brand">
+    <div class="dd-nav-mark">XE</div>
+    <div class="dd-nav-name">PracticalX</div>
+  </a>
+  <div class="dd-nav-title">Representing AI Agents in C4</div>
+  <a href="#" class="dd-nav-cta" data-author-field="linkedin-href" target="_blank" rel="noopener">
+    Follow on LinkedIn
+  </a>
+</nav>
+
+<main>
+
+  <!-- BREADCRUMB -->
+  <nav class="dd-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">PracticalX</a>
+    <span class="dd-breadcrumb-sep">→</span>
+    <a href="/content/ai/">Learning AI Out Loud</a>
+    <span class="dd-breadcrumb-sep">→</span>
+    <a href="/deep-dives/">Deep Dives</a>
+    <span class="dd-breadcrumb-sep">→</span>
+    <span class="dd-breadcrumb-current">Representing AI Agents in C4</span>
+  </nav>
+
+  <!-- HERO -->
+  <header class="dd-hero">
+    <div class="dd-series-tag">
+      <span class="dd-series-tag-text">Learning AI Out Loud · Day 19 of 30</span>
+    </div>
+
+    <h1 class="dd-title">Representing AI Agents in C4 — A Practical Approach Worth Considering</h1>
+    <p class="dd-subtitle">C4 was designed for deterministic systems. AI agents are not deterministic. Here is a working model for bridging that gap.</p>
+
+    <div class="dd-author-meta">
+      <div class="dd-author-avatar">K</div>
+      <div class="dd-author-info">
+        <div class="dd-author-name" data-author-field="name">Karthik Mahadevan</div>
+        <div class="dd-author-role" data-author-field="role">CIO · Building PracticalX</div>
+      </div>
+      <div class="dd-meta-right">
+        <div class="dd-meta-item">
+          <span class="dd-meta-label">Published</span>
+          <span class="dd-meta-value">June 2026</span>
+        </div>
+        <div class="dd-meta-divider"></div>
+        <div class="dd-meta-item">
+          <span class="dd-meta-label">Read time</span>
+          <span class="dd-meta-value" id="readTime">6 min read</span>
+        </div>
+        <div class="dd-meta-divider"></div>
+        <div class="dd-meta-item">
+          <span class="dd-meta-label">Series</span>
+          <span class="dd-meta-value">Learning AI Out Loud</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dd-tags">
+      <a href="#" class="dd-tag">C4 Architecture</a>
+      <a href="#" class="dd-tag">Agentic AI</a>
+      <a href="#" class="dd-tag">Software Architecture</a>
+      <a href="#" class="dd-tag">Enterprise Design</a>
+      <a href="#" class="dd-tag">LearningAIOutLoud</a>
+    </div>
+  </header>
+
+  <!-- ARTICLE BODY -->
+  <article class="dd-body">
+
+    <!-- ── SECTION 1 ── -->
+    <div class="dd-section reveal">
+      <span class="dd-section-num">Section 01</span>
+      <h2 class="dd-section-title">The Question I Couldn't Answer</h2>
+    </div>
+    <hr class="dd-section-divider">
+
+    <p class="drop-cap reveal">I was reviewing a C4 architecture diagram with my team recently when someone asked a question I couldn't cleanly answer.</p>
+
+    <p class="reveal">"Where do the AI agents go?"</p>
+
+    <p class="reveal">Not conceptually. Literally — which box, which level, which relationship arrow in the diagram?</p>
+
+    <p class="reveal">C4 is the framework I reach for when I need to communicate architecture clearly. Context, Container, Component, Code. Four levels of abstraction that force you to think carefully about system boundaries, responsibilities, and interfaces. It works because it's simple, scalable, and technology-agnostic.</p>
+
+    <p class="reveal">But C4 was designed for deterministic systems. You draw a box. You label it. You define its interfaces. The box does what it says every time.</p>
+
+    <p class="reveal">AI agents don't behave like boxes.</p>
+
+    <p class="reveal">They plan. They decide. They initiate actions autonomously. They produce different outputs for identical inputs. They traverse system boundaries in ways that a conventional relationship arrow doesn't capture honestly.</p>
+
+    <p class="reveal">I went looking for guidance on how to represent this in C4 and found something worth sharing — the gap is real, documented, and actively being worked on by the architecture community. A 2026 industry report explicitly acknowledged that C4 and arc42 don't prescribe agentic-specific constructs — agent roles and boundaries, tool access, interaction protocols, memory structures.</p>
+
+    <p class="reveal">What follows is my current working model. Not a standard — there isn't one yet. A practical approach worth considering as your team navigates the same question.</p>
+
+    <div class="dd-pullquote reveal">
+      <div class="dd-pullquote-text">"AI agents don't behave like boxes. They plan. They decide. They initiate actions autonomously."</div>
+    </div>
+
+    <!-- ── SECTION 2 ── -->
+    <div class="dd-section reveal">
+      <span class="dd-section-num">Section 02</span>
+      <h2 class="dd-section-title">Starting Point — What C4 Gets Right</h2>
+    </div>
+    <hr class="dd-section-divider">
+
+    <p class="reveal">Before extending anything it's worth being clear about what C4 already handles well when it comes to AI systems.</p>
+
+    <p class="reveal">The four-level hierarchy maps cleanly onto the questions you need to answer about any AI deployment:</p>
+
+    <ul class="dd-signal-list">
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-title">Context</div>
+          <div class="dd-signal-desc">Who are the users and what external systems does this touch?</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-title">Container</div>
+          <div class="dd-signal-desc">What are the separately deployable units and how do they communicate?</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-title">Component</div>
+          <div class="dd-signal-desc">What are the internal building blocks and their responsibilities?</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-title">Code</div>
+          <div class="dd-signal-desc">How is the code structured?</div>
+        </div>
+      </li>
+    </ul>
+
+    <p class="reveal">The framework doesn't break down because the questions are wrong. It breaks down because the answers for AI systems don't fit the conventional element types — and the relationship notation assumes synchronous deterministic calls that agents frequently don't make.</p>
+
+    <p class="reveal">The extension is about adding element types and relationship conventions that reflect how agentic systems actually behave — without abandoning the C4 principles that make it useful.</p>
+
+    <!-- ── SECTION 3 ── -->
+    <div class="dd-section reveal">
+      <span class="dd-section-num">Section 03</span>
+      <h2 class="dd-section-title">At the Context Level — Model Providers Are External Systems</h2>
+    </div>
+    <hr class="dd-section-divider">
+
+    <p class="reveal">Model providers — OpenAI, Anthropic, AWS Bedrock, Azure OpenAI — are external systems. They have defined interfaces, data flows, SLAs, and critically, data residency implications. If your system sends data to a model provider, that relationship belongs in your context diagram the same way any third party dependency does.</p>
+
+    <p class="reveal">This matters beyond the diagram. A context diagram that shows your model provider forces conversations about:</p>
+
+    <ul class="dd-signal-list">
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-desc">What data leaves your system boundary and where does it go?</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-desc">What happens to your system if the model provider has an outage?</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-desc">Which model provider is each part of your system dependent on — and have you accepted that as a risk?</div>
+        </div>
+      </li>
+    </ul>
+
+    <p class="reveal">If your C4 context diagram was drawn before your organisation started using AI and hasn't been updated since, it is already incomplete. That's not an architecture problem. It's a governance problem waiting to surface.</p>
+
+    <!-- ── SECTION 4 ── -->
+    <div class="dd-section reveal">
+      <span class="dd-section-num">Section 04</span>
+      <h2 class="dd-section-title">At the Container Level — Three New Container Types</h2>
+    </div>
+    <hr class="dd-section-divider">
+
+    <p class="reveal">AI systems introduce three container types that pass the deployability test but don't fit the conventional labels.</p>
+
+    <div class="dd-tool-card reveal">
+      <div class="dd-tool-header">
+        <div class="dd-tool-icon">🎼</div>
+        <div>
+          <div class="dd-tool-name">The Orchestration Container</div>
+          <div class="dd-tool-tagline">The coordination layer</div>
+        </div>
+      </div>
+      <div class="dd-tool-desc">The runtime that manages agent behaviour, sequences tool calls, maintains conversational state, and routes between agents. LangChain, AutoGen, LlamaIndex, and Microsoft's Agent Framework all live here. The orchestration container is the conductor — it doesn't do the work directly, it coordinates the things that do.</div>
+    </div>
+
+    <div class="dd-tool-card reveal">
+      <div class="dd-tool-header">
+        <div class="dd-tool-icon">🤖</div>
+        <div>
+          <div class="dd-tool-name">The Agent Container</div>
+          <div class="dd-tool-tagline">The autonomous actor</div>
+        </div>
+      </div>
+      <div class="dd-tool-desc">A defined goal, a defined set of tools it can invoke, a defined permission scope, and a decision-making capability that operates without step-by-step human instruction. Its blast radius — everything it can reach if compromised or manipulated — should be visible at the container level.</div>
+    </div>
+
+    <div class="dd-tool-card reveal">
+      <div class="dd-tool-header">
+        <div class="dd-tool-icon">🧠</div>
+        <div>
+          <div class="dd-tool-name">The Model Container</div>
+          <div class="dd-tool-tagline">The inference layer</div>
+        </div>
+      </div>
+      <div class="dd-tool-desc">The model itself — whether accessed via a hosted API or running locally. A separately deployable unit with its own latency profile, cost model, versioning characteristics, and data handling behaviour. Representing the model as a distinct container separates two concerns that are frequently confused: the model's capabilities and the agent's behaviour.</div>
+    </div>
+
+    <div class="dd-pullquote reveal">
+      <div class="dd-pullquote-text">"The blast radius of an agent container — everything it can reach if compromised — should be visible at the container level."</div>
+    </div>
+
+    <!-- ── SECTION 5 ── -->
+    <div class="dd-section reveal">
+      <span class="dd-section-num">Section 05</span>
+      <h2 class="dd-section-title">At the Component Level — Inside the Agent Container</h2>
+    </div>
+    <hr class="dd-section-divider">
+
+    <p class="reveal">Inside an Agent Container, these are the components worth making visible — and the architectural conversation each one forces.</p>
+
+    <ul class="dd-signal-list">
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-title">The Prompt Template Layer</div>
+          <div class="dd-signal-desc">Who owns the prompts that define this agent's behaviour? Who can change them? What is the process for updating a prompt in production?</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-title">The Tool Registry</div>
+          <div class="dd-signal-desc">What can this agent actually invoke? Every tool in the registry is a capability — and a potential blast radius extension.</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-title">The Memory Store</div>
+          <div class="dd-signal-desc">What does this agent remember across sessions? Where is that memory stored? Who can read it, modify it, or delete it?</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-title">The Guardrails Layer</div>
+          <div class="dd-signal-desc">What constraints exist on this agent's behaviour? If the answer is nothing formal — that belongs on the diagram too. An absent guardrails layer is an architectural decision, even if it wasn't made consciously.</div>
+        </div>
+      </li>
+    </ul>
+
+    <!-- ── SECTION 6 ── -->
+    <div class="dd-section reveal">
+      <span class="dd-section-num">Section 06</span>
+      <h2 class="dd-section-title">The Part I Haven't Solved Yet — Relationship Notation</h2>
+    </div>
+    <hr class="dd-section-divider">
+
+    <p class="reveal">Traditional C4 relationship arrows represent synchronous calls. A calls B. B responds predictably.</p>
+
+    <p class="reveal">Agentic systems break this in two ways:</p>
+
+    <ul class="dd-signal-list">
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-desc">Agents initiate actions — they don't just respond to calls.</div>
+        </div>
+      </li>
+      <li class="dd-signal-item reveal">
+        <div class="dd-signal-icon">→</div>
+        <div class="dd-signal-content">
+          <div class="dd-signal-desc">Agent responses are non-deterministic — the same input produces different outputs.</div>
+        </div>
+      </li>
+    </ul>
+
+    <p class="reveal">Structurizr — the tooling built by C4's creator Simon Brown — has begun acknowledging AI agent workflows. They've released an MCP server for diagram validation and added support for AI agent use cases. But there is no official notation guidance yet for representing autonomous initiation or non-deterministic relationships.</p>
+
+    <p class="reveal">My current pragmatic approach: annotate autonomous relationships explicitly — labelling them as "autonomous action" rather than "calls" — and note non-deterministic responses in the relationship description rather than leaving them implicit. It's not a clean solution. But it's honest.</p>
+
+    <div class="dd-pullquote reveal">
+      <div class="dd-pullquote-text">"An imperfect diagram that shows where your AI agents sit is significantly more valuable than a clean diagram that pretends AI isn't there."</div>
+    </div>
+
+    <!-- ── SECTION 7 ── -->
+    <div class="dd-section reveal">
+      <span class="dd-section-num">Section 07</span>
+      <h2 class="dd-section-title">Where This Leaves Us</h2>
+    </div>
+    <hr class="dd-section-divider">
+
+    <p class="reveal">C4 doesn't give us a standard for representing agentic AI yet. The architecture community is working on it and the gap is acknowledged at the research level.</p>
+
+    <p class="reveal">What we can do in the meantime is be deliberate. Name the new elements. Draw the new boundaries. Ask the questions that the diagram forces — even if the notation isn't perfect yet.</p>
+
+    <p class="reveal">An imperfect diagram that shows where your AI agents sit, what they can reach, and what governs their behaviour is significantly more valuable than a clean diagram that pretends AI isn't there.</p>
+
+    <div class="dd-conviction reveal">
+      <p>The question "where does AI sit in your C4 diagram" is deceptively simple.</p>
+      <div class="conviction-quote">The answer reveals how clearly your organisation has thought about what it's actually building.</div>
+    </div>
+
+    <!-- AUTHOR BIO -->
+    <div class="dd-author-bio reveal">
+      <div class="dd-bio-avatar">K</div>
+      <div class="dd-bio-content">
+        <div class="dd-bio-label">About the Author</div>
+        <div class="dd-bio-name" data-author-field="name">Karthik Mahadevan</div>
+        <div class="dd-bio-role" data-author-field="tagline">Still learning. Always building.</div>
+        <p class="dd-bio-text">I spend my days at the intersection of technology leadership and hands-on building. The question of how to represent AI agents in architecture diagrams isn't academic — it comes up in real conversations with real teams. PracticalX is where I share what I'm working through.</p>
+        <div class="dd-bio-links">
+          <a href="#" class="dd-bio-link" data-author-field="linkedin-href" target="_blank" rel="noopener">Connect on LinkedIn</a>
+          <a href="#" class="dd-bio-link outline" data-author-field="series-href">Follow the Series</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERIES NAVIGATION -->
+    <div class="dd-series-nav reveal">
+      <a href="/content/ai/day18/" class="dd-nav-card">
+        <div class="dd-nav-card-dir">← Day 18</div>
+        <div class="dd-nav-card-title">The AI Model Governance Starter Kit</div>
+      </a>
+      <a href="/content/ai/day19/" class="dd-nav-card">
+        <div class="dd-nav-card-dir">See the toolkit</div>
+        <div class="dd-nav-card-title">Day 19 · Structurizr DSL starter →</div>
+      </a>
+    </div>
+
+    <div class="reveal" style="margin-top: 20px; text-align: center;">
+      <a href="/content/ai/" style="font-family:'DM Mono',monospace; font-size:12px; color:var(--dd-accent); text-decoration:none; letter-spacing:0.5px;">← Back to Learning AI Out Loud</a>
+    </div>
+
+    <!-- SMALL PRINT -->
+    <p class="reveal" style="margin-top:40px; font-size:11px; color:var(--dd-text-light); line-height:1.6; text-align:center; font-style:italic;">
+      This article reflects the author's personal views and exploration. It is not affiliated with any employer.
+    </p>
+
+  </article>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="dd-footer">
+  <div>
+    <a href="/" class="dd-footer-brand">
+      <div class="dd-footer-mark">XE</div>
+      <div class="dd-footer-name">Practical<span>X</span></div>
+    </a>
+    <div class="dd-footer-tagline">Practical mastery, one X at a time · practicalx.co</div>
+  </div>
+  <nav class="dd-footer-links">
+    <a href="/content/ai/" class="dd-footer-link">Learning AI Out Loud</a>
+    <a href="/deep-dives/" class="dd-footer-link">Deep Dives</a>
+    <a href="/#about" class="dd-footer-link">About</a>
+    <a href="#" class="dd-footer-link" data-author-field="linkedin-href" target="_blank" rel="noopener">LinkedIn →</a>
+  </nav>
+  <div class="dd-footer-copy">
+    PracticalX · Practical mastery, one X at a time · This article reflects the author's personal views and exploration. It is not affiliated with any employer.
+  </div>
+</footer>
+
+<script src="/js/deep-dive.js" defer></script>
+
+</body>
+</html>
