@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Dives — PracticalX</title>
+<meta name="description" content="Long form articles from the PracticalX series. Go deeper on the topics that deserve more than a post.">
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+<style>
+  /* ── DARK THEME OVERRIDE ── */
+  :root {
+    --bg:             #383838;
+    --surface:        #424242;
+    --surface-alt:    #3C3C3C;
+    --text:           #F0F0F0;
+    --text-muted:     #B0B0B0;
+    --text-light:     #707070;
+    --border:         rgba(255,255,255,0.08);
+    --border-strong:  rgba(255,255,255,0.14);
+    --accent:         #8064A2;
+    --accent-light:   rgba(128,100,162,0.18);
+    --accent2:        #00B4CC;
+  }
+
+  body { overflow-x: hidden; }
+
+  a { color: var(--accent); }
+  a:hover { color: var(--accent2); }
+
+  /* ── SITE NAV ── */
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 56px;
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(56,56,56,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .site-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .site-nav-mark {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, #7B5CFA, #00D4EE);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 11px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .site-nav-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .site-nav-name span { color: #00D4EE; }
+
+  .site-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .site-nav-link {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .site-nav-link:hover { color: var(--text); }
+  .site-nav-link.active { color: var(--text); }
+
+  @media (max-width: 600px) {
+    .site-nav { padding: 0 20px; }
+    .site-nav-links { display: none; }
+  }
+
+  /* ── PAGE WRAPPER ── */
+  .dd-index-wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  @media (max-width: 600px) {
+    .dd-index-wrap { padding: 0 20px; }
+  }
+
+  /* ── BREADCRUMB ── */
+  .dd-index-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 24px 0 0;
+    flex-wrap: wrap;
+  }
+
+  .dd-index-breadcrumb a {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-light);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+
+  .dd-index-breadcrumb a:hover { color: var(--accent); }
+
+  .dd-bc-sep {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-light);
+    opacity: 0.5;
+  }
+
+  .dd-bc-current {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .dd-index-header {
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dd-index-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 5vw, 52px);
+    color: var(--text);
+    letter-spacing: -2px;
+    line-height: 1.05;
+    margin-bottom: 12px;
+  }
+
+  .dd-index-subtitle {
+    font-size: clamp(14px, 1.6vw, 17px);
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 520px;
+    margin-bottom: 24px;
+  }
+
+  .dd-index-rule {
+    height: 3px;
+    width: 48px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* ── FILTER ROW ── */
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 0;
+    flex-wrap: wrap;
+  }
+
+  .filter-pill {
+    padding: 6px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .filter-pill:hover { border-color: var(--accent); color: var(--text); }
+
+  .filter-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-weight: 500;
+  }
+
+  /* ── CARDS GRID ── */
+  .dd-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding-bottom: 48px;
+  }
+
+  @media (max-width: 680px) {
+    .dd-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── ARTICLE CARD ── */
+  .deepdive-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    cursor: pointer;
+  }
+
+  .deepdive-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 24px rgba(128,100,162,0.18);
+    transform: translateY(-2px);
+    color: inherit;
+  }
+
+  .card-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .card-series-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: #C8B8E8;
+    background: rgba(128,100,162,0.2);
+    padding: 3px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .card-read-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-light);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(15px, 1.8vw, 18px);
+    color: var(--text);
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+  }
+
+  .card-day {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  .card-desc {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text-muted);
+    line-height: 1.65;
+    font-weight: 300;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  .card-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-light);
+    letter-spacing: 0.3px;
+  }
+
+  .card-read-link {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    transition: color 0.15s;
+  }
+
+  .deepdive-card:hover .card-read-link { color: #B09AD0; }
+
+  /* ── EMPTY STATE ── */
+  .dd-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 0;
+    font-size: 15px;
+    color: var(--text-light);
+    font-style: italic;
+  }
+
+  /* ── BOTTOM CALLOUT ── */
+  .dd-more-callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin-bottom: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dd-more-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(18px, 2vw, 22px);
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .dd-more-body {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-weight: 300;
+    max-width: 540px;
+  }
+
+  .dd-more-link {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s;
+    align-self: flex-start;
+  }
+
+  .dd-more-link:hover { color: var(--accent2); }
+
+  /* ── PAGE FOOTER ── */
+  .dd-page-footer {
+    background: #2A2A2A;
+    border-top: 1px solid var(--border);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .dd-footer-brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .dd-footer-mark {
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, #7B5CFA, #00D4EE);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 10px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .dd-footer-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+  }
+
+  .dd-footer-name span { color: #00D4EE; }
+
+  .dd-footer-tagline {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .dd-footer-links-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .dd-footer-link {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .dd-footer-link:hover { color: #00D4EE; }
+
+  .dd-footer-copy {
+    width: 100%;
+    padding-top: 16px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.18);
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .dd-page-footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SITE NAV -->
+<nav class="site-nav" role="navigation">
+  <a href="/" class="site-nav-brand">
+    <div class="site-nav-mark">XE</div>
+    <div class="site-nav-name">Practical<span>X</span></div>
+  </a>
+  <div class="site-nav-links">
+    <a href="/content/ai/" class="site-nav-link">Learning AI Out Loud</a>
+    <a href="/deep-dives/" class="site-nav-link active">Deep Dives</a>
+    <a href="/" class="site-nav-link">Home</a>
+  </div>
+</nav>
+
+<div class="dd-index-wrap">
+
+  <!-- BREADCRUMB -->
+  <nav class="dd-index-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">PracticalX</a>
+    <span class="dd-bc-sep">→</span>
+    <span class="dd-bc-current">Deep Dives</span>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="dd-index-header">
+    <h1 class="dd-index-title">Deep Dives</h1>
+    <p class="dd-index-subtitle">Some topics deserve more than a toolkit. These are the ones worth settling into.</p>
+    <div class="dd-index-rule"></div>
+  </div>
+
+  <!-- SERIES FILTER -->
+  <div class="filter-row" role="group" aria-label="Filter by series">
+    <button class="filter-pill active" data-filter="all" onclick="filterCards('all')">All</button>
+    <button class="filter-pill" data-filter="learning-ai-out-loud" onclick="filterCards('learning-ai-out-loud')">Learning AI Out Loud</button>
+  </div>
+
+  <!-- CARDS GRID -->
+  <div class="dd-grid" id="ddGrid">
+
+    <!-- Card 1 — Day 19 -->
+    <a href="/deep-dives/ai/c4-and-agentic-ai/" class="deepdive-card" data-series="learning-ai-out-loud">
+      <div class="card-top-row">
+        <span class="card-series-tag">Learning AI Out Loud</span>
+        <span class="card-read-time">6 min read</span>
+      </div>
+      <div class="card-title">Representing AI Agents in C4 — A Practical Approach Worth Considering</div>
+      <div class="card-day">Day 19 · Arc 4</div>
+      <div class="card-desc">C4 was designed for deterministic systems. AI agents are not. A working model for extending C4 notation to accommodate agentic systems.</div>
+      <div class="card-footer">
+        <span class="card-date">June 2026</span>
+        <span class="card-read-link">Read article →</span>
+      </div>
+    </a>
+
+    <!-- Card 2 — Day 11 -->
+    <a href="/deep-dives/ai/navigating-ai-tools/" class="deepdive-card" data-series="learning-ai-out-loud">
+      <div class="card-top-row">
+        <span class="card-series-tag">Learning AI Out Loud</span>
+        <span class="card-read-time">5 min read</span>
+      </div>
+      <div class="card-title">Navigating AI Tools — A Technical Journey</div>
+      <div class="card-day">Day 11 · Arc 2</div>
+      <div class="card-desc">A practical walkthrough of the AI tools landscape — from experimentation to enterprise adoption.</div>
+      <div class="card-footer">
+        <span class="card-date">May 2026</span>
+        <span class="card-read-link">Read article →</span>
+      </div>
+    </a>
+
+    <!-- Card 3 — Day 12 -->
+    <a href="/deep-dives/ai/ai-tools-financial-journey/" class="deepdive-card" data-series="learning-ai-out-loud">
+      <div class="card-top-row">
+        <span class="card-series-tag">Learning AI Out Loud</span>
+        <span class="card-read-time">5 min read</span>
+      </div>
+      <div class="card-title">The Financial Journey of AI Tool Adoption</div>
+      <div class="card-day">Day 12 · Arc 2</div>
+      <div class="card-desc">What AI tools actually cost — and how to think about the economics of adoption at an enterprise level.</div>
+      <div class="card-footer">
+        <span class="card-date">May 2026</span>
+        <span class="card-read-link">Read article →</span>
+      </div>
+    </a>
+
+    <!-- Empty state (hidden unless filter returns nothing) -->
+    <div class="dd-empty" id="ddEmpty" style="display:none;" aria-live="polite">
+      No deep dives in this series yet. Check back soon.
+    </div>
+
+  </div><!-- /dd-grid -->
+
+  <!-- BOTTOM CALLOUT -->
+  <div class="dd-more-callout">
+    <div class="dd-more-title">More on the way</div>
+    <div class="dd-more-body">Deep Dives are published alongside the Learning AI Out Loud series — when a topic deserves more space than a toolkit can give it.</div>
+    <a href="/content/ai/" class="dd-more-link">Follow the series → Learning AI Out Loud</a>
+  </div>
+
+</div><!-- /dd-index-wrap -->
+
+<!-- PAGE FOOTER -->
+<footer class="dd-page-footer">
+  <div>
+    <a href="/" class="dd-footer-brand-row">
+      <div class="dd-footer-mark">XE</div>
+      <div class="dd-footer-name">Practical<span>X</span></div>
+    </a>
+    <div class="dd-footer-tagline">Practical mastery, one X at a time · practicalx.co</div>
+  </div>
+  <nav class="dd-footer-links-row">
+    <a href="/content/ai/" class="dd-footer-link">Learning AI Out Loud</a>
+    <a href="/deep-dives/" class="dd-footer-link">Deep Dives</a>
+    <a href="/" class="dd-footer-link">Home</a>
+    <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="dd-footer-link" target="_blank" rel="noopener">LinkedIn →</a>
+  </nav>
+  <div class="dd-footer-copy">PracticalX · Practical mastery, one X at a time · practicalx.co</div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  window.filterCards = function (series) {
+    // Update active pill
+    document.querySelectorAll('.filter-pill').forEach(function (pill) {
+      pill.classList.toggle('active', pill.dataset.filter === series);
+    });
+
+    // Show / hide cards
+    var cards  = document.querySelectorAll('.deepdive-card');
+    var visible = 0;
+
+    cards.forEach(function (card) {
+      var show = series === 'all' || card.dataset.series === series;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    // Empty state
+    var empty = document.getElementById('ddEmpty');
+    empty.style.display = visible === 0 ? 'block' : 'none';
+  };
+}());
+</script>
+
+</body>
+</html>
