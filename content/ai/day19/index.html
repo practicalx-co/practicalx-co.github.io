@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 19 · C4 for Agentic AI — A Working Reference</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+<style>
+  /* ── DEEP DIVE CALLOUT ── */
+  .deep-dive-callout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--accent-light);
+    border: 1px solid rgba(91,63,191,0.18);
+    border-radius: 10px;
+    padding: 18px 22px;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .deep-dive-callout:hover {
+    border-color: rgba(91,63,191,0.35);
+    background: #E5DEFF;
+    color: inherit;
+  }
+
+  .deep-dive-callout-left { display: flex; flex-direction: column; gap: 4px; }
+
+  .deep-dive-callout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .deep-dive-callout-title {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .deep-dive-callout-arrow {
+    font-size: 20px;
+    color: var(--accent);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  .deep-dive-callout:hover .deep-dive-callout-arrow { transform: translateX(4px); }
+
+  /* ── C4 REFERENCE TABLE ── */
+  .c4-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .c4-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: clamp(12px, 1.3vw, 14px);
+    min-width: 560px;
+  }
+
+  .c4-table thead th {
+    background: #8064A2;
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .c4-table tbody tr { border-bottom: 1px solid var(--border); }
+  .c4-table tbody tr:last-child { border-bottom: none; }
+
+  .c4-table td {
+    padding: 12px 16px;
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  /* Level-based row colouring */
+  .c4-table tr.level-context { background: #F0EAF8; }
+  .c4-table tr.level-container { background: #FAFAF8; }
+  .c4-table tr.level-component { background: #F4F3F0; }
+
+  .c4-table tr.level-context:hover  { background: #E8E0F4; }
+  .c4-table tr.level-container:hover { background: #F0EDE8; }
+  .c4-table tr.level-component:hover { background: #ECEAE4; }
+
+  .c4-level-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 100px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .badge-level-context   { background: rgba(128,100,162,0.15); color: #8064A2; }
+  .badge-level-container { background: rgba(26,79,159,0.12);   color: var(--blue); }
+  .badge-level-component { background: rgba(26,127,90,0.12);   color: var(--green); }
+
+  .c4-element-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text);
+    letter-spacing: -0.2px;
+  }
+
+  .c4-table .examples-cell {
+    color: var(--text-muted);
+    font-size: clamp(11px, 1.1vw, 12px);
+    font-style: italic;
+  }
+
+  /* Mobile card layout */
+  @media (max-width: 600px) {
+    .c4-table-wrap { border: none; border-radius: 0; overflow: visible; }
+    .c4-table, .c4-table thead, .c4-table tbody,
+    .c4-table th, .c4-table td, .c4-table tr { display: block; }
+    .c4-table thead { display: none; }
+    .c4-table tbody tr {
+      background: white !important;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      padding: 12px 16px;
+    }
+    .c4-table tbody tr:hover { background: white !important; }
+    .c4-table td {
+      padding: 4px 0;
+      border: none;
+    }
+    .c4-table td::before {
+      content: attr(data-label);
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 2px;
+    }
+  }
+
+  /* ── DSL CODE BLOCK ── */
+  .dsl-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #1A1A1A;
+  }
+
+  .dsl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: #1E1E1E;
+    border-bottom: 1px solid #333;
+  }
+
+  .dsl-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dsl-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .dsl-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .dsl-dot-red    { background: #FF5F57; }
+  .dsl-dot-amber  { background: #FEBC2E; }
+  .dsl-dot-green  { background: #28C840; }
+
+  .dsl-filename {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.5px;
+  }
+
+  .dsl-copy-btn {
+    padding: 6px 16px;
+    background: #8064A2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .dsl-copy-btn:hover { background: #6A5090; }
+  .dsl-copy-btn.copied { background: #1A7F5A; }
+
+  .dsl-body {
+    background: #2D2D2D;
+    overflow-x: auto;
+    padding: 0;
+  }
+
+  .dsl-code {
+    display: table;
+    min-width: 100%;
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(11px, 1.2vw, 13px);
+    line-height: 1.7;
+    padding: 20px 0;
+  }
+
+  .dsl-line {
+    display: table-row;
+  }
+
+  .dsl-line:hover .dsl-num,
+  .dsl-line:hover .dsl-text { background: rgba(255,255,255,0.04); }
+
+  .dsl-num {
+    display: table-cell;
+    width: 48px;
+    min-width: 48px;
+    padding: 0 14px 0 18px;
+    text-align: right;
+    color: #555;
+    font-size: 11px;
+    user-select: none;
+    vertical-align: top;
+    border-right: 1px solid #3A3A3A;
+  }
+
+  .dsl-text {
+    display: table-cell;
+    padding: 0 20px 0 16px;
+    white-space: pre;
+    color: #D4D4D4;
+    vertical-align: top;
+  }
+
+  /* Syntax highlighting colours */
+  .t-kw   { color: #C586C0; }  /* keywords: workspace, model, views, etc. */
+  .t-type { color: #4EC9B0; }  /* types: person, softwareSystem, container, component */
+  .t-id   { color: #9CDCFE; }  /* identifiers */
+  .t-str  { color: #CE9178; }  /* strings */
+  .t-op   { color: #D4D4D4; }  /* operators: =, ->, { } */
+  .t-cmt  { color: #6A9955; font-style: italic; }  /* comments */
+  .t-tag  { color: #DCDCAA; }  /* tags keyword */
+  .t-bang { color: #569CD6; }  /* !impliedRelationships */
+
+  /* ── AUTONOMOUS RELATIONSHIP CALLOUT ── */
+  .auto-callout {
+    background: #F4F3F0;
+    border: 1px solid var(--border-strong);
+    border-left: 3px solid #8064A2;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .auto-callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .auto-callout-text {
+    font-size: clamp(12px, 1.25vw, 14px);
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .structurizr-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-light);
+    text-align: right;
+  }
+
+  .structurizr-link a { color: var(--text-muted); }
+  .structurizr-link a:hover { color: var(--accent); }
+
+  /* ── CHECKLIST ── */
+  .arc-check {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .arc-check.answered { border-color: var(--border-strong); }
+
+  .arc-check-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 2px;
+  }
+
+  .arc-check-text {
+    font-size: clamp(13px, 1.35vw, 15px);
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .arc-check-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .arc-btn {
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .arc-btn:hover { border-color: var(--border-strong); color: var(--text); }
+  .arc-btn.sel-yes     { background: var(--green-light);  border-color: rgba(26,127,90,0.3);  color: var(--green);  font-weight: 500; }
+  .arc-btn.sel-partial { background: var(--amber-light);  border-color: rgba(180,90,0,0.3);   color: var(--amber);  font-weight: 500; }
+  .arc-btn.sel-no      { background: var(--red-light);    border-color: rgba(155,28,28,0.3);  color: var(--red);    font-weight: 500; }
+
+  .arc-checks { display: flex; flex-direction: column; gap: 10px; }
+
+  .arc-group { display: flex; flex-direction: column; gap: 10px; }
+
+  .arc-group-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8064A2;
+    padding: 0 0 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── SCORE PANEL ── */
+  .score-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    margin-bottom: 24px;
+  }
+
+  .score-panel-block { display: flex; flex-direction: column; gap: 4px; }
+
+  .score-panel-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .score-panel-value {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    color: #8064A2;
+    line-height: 1;
+  }
+
+  .score-panel-max  { font-size: clamp(14px, 1.5vw, 18px); color: var(--text-muted); font-weight: 400; }
+  .score-panel-ansd { font-family: 'DM Mono', monospace; font-size: clamp(13px, 1.4vw, 16px); color: var(--text-muted); }
+
+  /* ── SCORE RESULT ── */
+  .score-result {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px 32px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: white;
+    animation: fadeSlideIn 0.4s ease;
+  }
+
+  .score-result.visible { display: flex; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .score-result-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .score-result-tier  { font-family: 'Syne', sans-serif; font-size: clamp(22px, 2.5vw, 28px); font-weight: 800; line-height: 1.15; }
+  .score-result-score { font-family: 'DM Mono', monospace; font-size: clamp(13px, 1.3vw, 15px); color: var(--text-muted); }
+  .score-result-desc  { font-size: clamp(13px, 1.4vw, 15px); color: var(--text); line-height: 1.65; font-weight: 300; padding-top: 6px; border-top: 1px solid var(--border); }
+
+  .arc-disclaimer {
+    background: var(--accent-light);
+    border: 1px solid rgba(91,63,191,0.15);
+    border-radius: 10px;
+    padding: 18px 22px;
+    font-size: clamp(12px, 1.25vw, 14px);
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .arc-disclaimer a { color: var(--accent); font-weight: 500; }
+
+  .reset-btn {
+    align-self: flex-start;
+    padding: 10px 22px;
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover { border-color: #8064A2; color: #8064A2; }
+
+  /* ── ARTICLE LINK ── */
+  .article-link {
+    display: block;
+    text-align: center;
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--accent);
+    font-weight: 500;
+    padding: 12px 0;
+    transition: color 0.2s;
+  }
+
+  .article-link:hover { color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<!-- BACK NAV -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 19 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">C4 for Agentic AI —<br>A Working Reference</div>
+    <div class="header-quote">Where we place AI in our C4 diagram reveals how deliberately we've designed what we're building.</div>
+    <div class="header-arc">Arc 4 · AI and Architecture · Where does AI sit in your C4 diagram?</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p>C4 doesn't have an official standard for representing AI agents yet. This toolkit is a working reference — the element types, the DSL starter, and the review checklist we're using while that standard emerges. Adapt it to your own context.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      Arc 3 closed the security arc. Arc 4 opens with architecture — specifically, how to make AI visible in the diagrams your organisation already uses to reason about systems.
+    </div>
+
+    <!-- DEEP DIVE CALLOUT -->
+    <a href="/deep-dives/ai/c4-and-agentic-ai/" class="deep-dive-callout no-print">
+      <div class="deep-dive-callout-left">
+        <div class="deep-dive-callout-label">Deep Dive · Full Article</div>
+        <div class="deep-dive-callout-title">Representing AI Agents in C4 — A Practical Approach Worth Considering</div>
+      </div>
+      <div class="deep-dive-callout-arrow">→</div>
+    </a>
+
+    <!-- SECTION 1: C4 REFERENCE TABLE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-purple">📐</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 1 of 3</div>
+          <div class="section-title" style="color:#8064A2;">The New C4 Elements for Agentic AI</div>
+        </div>
+      </div>
+
+      <p style="font-size:clamp(13px,1.4vw,15px);color:var(--text-muted);line-height:1.65;margin-bottom:16px;">These element types extend standard C4 notation to accommodate AI agents, models, and orchestration layers.</p>
+
+      <div class="c4-table-wrap">
+        <table class="c4-table">
+          <thead>
+            <tr>
+              <th>Element Name</th>
+              <th>C4 Level</th>
+              <th>Description</th>
+              <th>Technology Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="level-context">
+              <td data-label="Element Name"><span class="c4-element-name">Model Provider</span></td>
+              <td data-label="C4 Level"><span class="c4-level-badge badge-level-context">Context</span></td>
+              <td data-label="Description">External system. Any third party provider your system sends data to for inference. Has interfaces, SLAs, and data residency implications.</td>
+              <td data-label="Technology Examples" class="examples-cell">OpenAI, Anthropic, AWS Bedrock, Azure OpenAI</td>
+            </tr>
+            <tr class="level-container">
+              <td data-label="Element Name"><span class="c4-element-name">Orchestration Container</span></td>
+              <td data-label="C4 Level"><span class="c4-level-badge badge-level-container">Container</span></td>
+              <td data-label="Description">The coordination layer. Manages agent behaviour, sequences tool calls, maintains state, and routes between agents. The conductor, not the musician.</td>
+              <td data-label="Technology Examples" class="examples-cell">LangChain, AutoGen, LlamaIndex, Microsoft Agent Framework</td>
+            </tr>
+            <tr class="level-container">
+              <td data-label="Element Name"><span class="c4-element-name">Agent Container</span></td>
+              <td data-label="C4 Level"><span class="c4-level-badge badge-level-container">Container</span></td>
+              <td data-label="Description">The autonomous actor. Defined goal, defined tools, defined permission scope. Its blast radius — everything it can reach — should be visible at this level.</td>
+              <td data-label="Technology Examples" class="examples-cell">Any custom agent built on an orchestration framework</td>
+            </tr>
+            <tr class="level-container">
+              <td data-label="Element Name"><span class="c4-element-name">Model Container</span></td>
+              <td data-label="C4 Level"><span class="c4-level-badge badge-level-container">Container</span></td>
+              <td data-label="Description">The inference layer. Separately deployable with its own latency profile, cost model, and data handling characteristics.</td>
+              <td data-label="Technology Examples" class="examples-cell">Hosted API, locally running model, fine-tuned model endpoint</td>
+            </tr>
+            <tr class="level-component">
+              <td data-label="Element Name"><span class="c4-element-name">Prompt Template Layer</span></td>
+              <td data-label="C4 Level"><span class="c4-level-badge badge-level-component">Component</span></td>
+              <td data-label="Description">The instructions that define agent behaviour. Treat changes to this layer with the same rigour as a code deployment.</td>
+              <td data-label="Technology Examples" class="examples-cell">System prompts, few-shot templates, chain-of-thought scaffolds</td>
+            </tr>
+            <tr class="level-component">
+              <td data-label="Element Name"><span class="c4-element-name">Tool Registry</span></td>
+              <td data-label="C4 Level"><span class="c4-level-badge badge-level-component">Component</span></td>
+              <td data-label="Description">Every tool the agent can invoke. Each entry is a capability — and a potential blast radius extension.</td>
+              <td data-label="Technology Examples" class="examples-cell">API connectors, file system access, database queries, web search</td>
+            </tr>
+            <tr class="level-component">
+              <td data-label="Element Name"><span class="c4-element-name">Memory Store</span></td>
+              <td data-label="C4 Level"><span class="c4-level-badge badge-level-component">Component</span></td>
+              <td data-label="Description">What the agent retains across sessions. Governs what it remembers, who can read it, and whether retention is appropriate.</td>
+              <td data-label="Technology Examples" class="examples-cell">Vector databases, session stores, conversation history</td>
+            </tr>
+            <tr class="level-component">
+              <td data-label="Element Name"><span class="c4-element-name">Guardrails Layer</span></td>
+              <td data-label="C4 Level"><span class="c4-level-badge badge-level-component">Component</span></td>
+              <td data-label="Description">Constraints on agent behaviour. If this layer is absent — that is an architectural decision and belongs on the diagram.</td>
+              <td data-label="Technology Examples" class="examples-cell">Content filters, permission boundaries, output validators</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 2: STRUCTURIZR DSL STARTER -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-green">💻</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 2 of 3</div>
+          <div class="section-title green">Structurizr DSL Starter</div>
+        </div>
+      </div>
+
+      <p style="font-size:clamp(13px,1.4vw,15px);color:var(--text-muted);line-height:1.7;margin-bottom:8px;">Structurizr uses a text format called DSL — Domain Specific Language — to define architecture diagrams as code. This means your architecture lives in version control, changes are tracked, and diagrams can be generated automatically.</p>
+
+      <p style="font-size:clamp(13px,1.4vw,15px);color:var(--text-muted);line-height:1.7;margin-bottom:20px;">The starter below implements the three container types and four component types from the reference card above. Copy it, substitute your own system and component names, and you have a working C4 model for your AI system in minutes.</p>
+
+      <!-- DSL CODE BLOCK -->
+      <div class="dsl-wrap no-print">
+        <div class="dsl-header">
+          <div class="dsl-header-left">
+            <div class="dsl-dots">
+              <div class="dsl-dot dsl-dot-red"></div>
+              <div class="dsl-dot dsl-dot-amber"></div>
+              <div class="dsl-dot dsl-dot-green"></div>
+            </div>
+            <div class="dsl-filename">agentic-ai-system.dsl</div>
+          </div>
+          <button class="dsl-copy-btn" id="dslCopyBtn" onclick="copyDsl()">Copy to Clipboard</button>
+        </div>
+        <div class="dsl-body">
+          <div class="dsl-code" id="dslCode" aria-label="Structurizr DSL code"></div>
+        </div>
+      </div>
+
+      <!-- PRINT FALLBACK: plain pre block -->
+      <pre id="dslPrint" style="display:none;background:#2D2D2D;color:#D4D4D4;padding:20px;border-radius:8px;font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre;font-family:'DM Mono',monospace;"></pre>
+
+      <!-- STRUCTURIZR LINK -->
+      <div class="structurizr-link" style="margin-top:10px;">
+        Learn more at <a href="https://structurizr.com" target="_blank" rel="noopener">structurizr.com</a> — built by C4's creator Simon Brown.
+      </div>
+
+      <!-- AUTONOMOUS RELATIONSHIP NOTE -->
+      <div class="auto-callout" style="margin-top:20px;">
+        <div class="auto-callout-icon">💡</div>
+        <div class="auto-callout-text">
+          Standard C4 relationship arrows assume synchronous deterministic calls. For agent-initiated actions, annotate the relationship explicitly as <strong>"autonomous action"</strong> — as shown above. This is a pragmatic convention while official notation guidance is still emerging from the C4 community.
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 3: ARCHITECTURE REVIEW CHECKLIST -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-badge badge-blue">✅</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 3 of 3</div>
+          <div class="section-title blue">The C4 AI Architecture Review Checklist</div>
+        </div>
+      </div>
+
+      <p style="font-size:clamp(13px,1.4vw,15px);color:var(--text-muted);line-height:1.65;margin-bottom:20px;">Six questions to ask before signing off any C4 diagram that includes AI.</p>
+
+      <!-- SCORE PANEL -->
+      <div class="score-panel">
+        <div class="score-panel-block">
+          <div class="score-panel-label">Current Score</div>
+          <div class="score-panel-value"><span id="score-current">0</span><span class="score-panel-max"> / 12</span></div>
+        </div>
+        <div class="score-panel-block" style="text-align:right;">
+          <div class="score-panel-label">Answered</div>
+          <div class="score-panel-ansd" id="score-answered">0 / 6</div>
+        </div>
+      </div>
+
+      <div class="arc-checks">
+
+        <!-- CONTEXT LEVEL -->
+        <div class="arc-group">
+          <div class="arc-group-label">Context Level</div>
+
+          <div class="arc-check" data-idx="0">
+            <div class="arc-check-label">Context · Model Provider</div>
+            <div class="arc-check-text">Our model provider appears as an external system in the context diagram with data flow and residency implications noted</div>
+            <div class="arc-check-btns">
+              <button class="arc-btn" onclick="arcRate(0,2,this,'yes')">✅ Yes</button>
+              <button class="arc-btn" onclick="arcRate(0,1,this,'partial')">⚠️ Partial</button>
+              <button class="arc-btn" onclick="arcRate(0,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTAINER LEVEL -->
+        <div class="arc-group">
+          <div class="arc-group-label">Container Level</div>
+
+          <div class="arc-check" data-idx="1">
+            <div class="arc-check-label">Container · Separation</div>
+            <div class="arc-check-text">The orchestration layer, agent container, and model container are represented as distinct deployable units</div>
+            <div class="arc-check-btns">
+              <button class="arc-btn" onclick="arcRate(1,2,this,'yes')">✅ Yes</button>
+              <button class="arc-btn" onclick="arcRate(1,1,this,'partial')">⚠️ Partial</button>
+              <button class="arc-btn" onclick="arcRate(1,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="arc-check" data-idx="2">
+            <div class="arc-check-label">Container · Blast Radius</div>
+            <div class="arc-check-text">The blast radius of every agent container is visible — we can draw what it can reach in under 10 minutes</div>
+            <div class="arc-check-btns">
+              <button class="arc-btn" onclick="arcRate(2,2,this,'yes')">✅ Yes</button>
+              <button class="arc-btn" onclick="arcRate(2,1,this,'partial')">⚠️ Partial</button>
+              <button class="arc-btn" onclick="arcRate(2,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPONENT LEVEL -->
+        <div class="arc-group">
+          <div class="arc-group-label">Component Level</div>
+
+          <div class="arc-check" data-idx="3">
+            <div class="arc-check-label">Component · Named Elements</div>
+            <div class="arc-check-text">The prompt template layer, tool registry, memory store, and guardrails layer are named as components inside each agent container</div>
+            <div class="arc-check-btns">
+              <button class="arc-btn" onclick="arcRate(3,2,this,'yes')">✅ Yes</button>
+              <button class="arc-btn" onclick="arcRate(3,1,this,'partial')">⚠️ Partial</button>
+              <button class="arc-btn" onclick="arcRate(3,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+
+          <div class="arc-check" data-idx="4">
+            <div class="arc-check-label">Component · Guardrails</div>
+            <div class="arc-check-text">The guardrails layer is explicitly represented — including if it is currently absent</div>
+            <div class="arc-check-btns">
+              <button class="arc-btn" onclick="arcRate(4,2,this,'yes')">✅ Yes</button>
+              <button class="arc-btn" onclick="arcRate(4,1,this,'partial')">⚠️ Partial</button>
+              <button class="arc-btn" onclick="arcRate(4,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RELATIONSHIPS -->
+        <div class="arc-group">
+          <div class="arc-group-label">Relationships</div>
+
+          <div class="arc-check" data-idx="5">
+            <div class="arc-check-label">Relationships · Autonomous Actions</div>
+            <div class="arc-check-text">Agent-initiated autonomous actions are annotated distinctly from standard synchronous calls</div>
+            <div class="arc-check-btns">
+              <button class="arc-btn" onclick="arcRate(5,2,this,'yes')">✅ Yes</button>
+              <button class="arc-btn" onclick="arcRate(5,1,this,'partial')">⚠️ Partial</button>
+              <button class="arc-btn" onclick="arcRate(5,0,this,'no')">❌ Not Yet</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /arc-checks -->
+
+      <!-- SCORE RESULT -->
+      <div class="score-result" id="score-result">
+        <div class="score-result-label">Your Result</div>
+        <div class="score-result-tier" id="result-tier"></div>
+        <div class="score-result-score" id="result-score"></div>
+        <div class="score-result-desc" id="result-desc"></div>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div class="arc-disclaimer" id="arc-disclaimer" style="display:none;">
+        This checklist reflects a working model, not an official C4 standard. The C4 community is actively developing guidance for agentic systems. For a deeper conversation about AI architecture for your organisation — <a href="https://www.linkedin.com/in/karthikmahadevan06/" target="_blank" rel="noopener">connect with me on LinkedIn</a>.
+      </div>
+
+      <!-- RESET -->
+      <button class="reset-btn no-print" id="reset-btn" style="display:none;" onclick="resetChecklist()">Review Again</button>
+
+    </div><!-- /section -->
+
+    <div class="divider"></div>
+
+    <!-- CLOSING LINE -->
+    <div class="core-idea">
+      <div class="pullquote">An imperfect diagram that shows where your AI agents sit is significantly more valuable than a clean diagram that pretends they aren't there.</div>
+    </div>
+
+    <!-- ARTICLE LINK -->
+    <a href="/deep-dives/ai/c4-and-agentic-ai/" class="article-link no-print">
+      Read the full article: Representing AI Agents in C4 — A Practical Approach Worth Considering →
+    </a>
+
+  </div><!-- /body -->
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section no-print">
+    <div class="progress-header">
+      <div class="progress-label">Series Progress</div>
+      <div class="progress-count">Day 19 / 30</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 63%"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 19 OF 30 · ARC 4 · AI AND ARCHITECTURE</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── DSL SOURCE ── */
+  var DSL_TEXT = [
+    'workspace "Agentic AI System" "C4 model for an agentic AI deployment" {',
+    '',
+    '    model {',
+    '',
+    '        !impliedRelationships true',
+    '',
+    '        // People',
+    '        user = person "User" "A person interacting with the AI system"',
+    '',
+    '        // External Systems (Context Level)',
+    '        modelProvider = softwareSystem "Model Provider" "External AI inference provider. Sends data outside your system boundary." {',
+    '            tags "External System"',
+    '        }',
+    '',
+    '        // Your System',
+    '        agenticSystem = softwareSystem "Agentic AI System" "An AI system that autonomously plans, decides, and acts to achieve defined goals." {',
+    '',
+    '            orchestrationContainer = container "Orchestration Layer" "Coordinates agent behaviour, sequences tool calls, maintains state, and routes between agents." "LangChain / AutoGen / LlamaIndex" {',
+    '                tags "Orchestration"',
+    '            }',
+    '',
+    '            agentContainer = container "Agent" "The autonomous actor. Operates within defined tool access and permission scope." "Custom Agent" {',
+    '                tags "Agent"',
+    '',
+    '                promptLayer     = component "Prompt Template Layer" "Defines agent behaviour and instructions. Treat changes with the same rigour as a code deployment."',
+    '                toolRegistry    = component "Tool Registry" "Every tool this agent can invoke. Each entry extends the blast radius."',
+    '                memoryStore     = component "Memory Store" "What the agent retains across sessions. Review retention policy and access controls."',
+    '                guardrailsLayer = component "Guardrails Layer" "Constraints on agent behaviour. If absent — document that decision explicitly."',
+    '',
+    '                // Autonomous action: labelled explicitly to distinguish agent-initiated',
+    '                // tool invocations from standard synchronous calls.',
+    '                // Structurizr has no native semantic for non-deterministic relationships —',
+    '                // the label is the current pragmatic convention.',
+    '                promptLayer -> toolRegistry "autonomous action — selects and invokes tool via"',
+    '            }',
+    '',
+    '            modelContainer = container "Model Container" "The inference layer. Separately deployable with its own latency, cost, and data handling characteristics." "Hosted API / Local Model" {',
+    '                tags "Model"',
+    '            }',
+    '        }',
+    '',
+    '        // Relationships',
+    '        user -> orchestrationContainer "Submits request to"',
+    '        orchestrationContainer -> agentContainer "Delegates task to"',
+    '        agentContainer -> modelContainer "Sends inference request to" "API"',
+    '        modelContainer -> modelProvider "Routes inference to" "HTTPS — note: data leaves your system boundary"',
+    '    }',
+    '',
+    '    views {',
+    '',
+    '        systemContext agenticSystem "SystemContext" {',
+    '            include *',
+    '            autolayout lr',
+    '        }',
+    '',
+    '        container agenticSystem "Containers" {',
+    '            include *',
+    '            autolayout lr',
+    '        }',
+    '',
+    '        component agentContainer "AgentComponents" {',
+    '            include *',
+    '            autolayout lr',
+    '        }',
+    '',
+    '        theme default',
+    '    }',
+    '',
+    '}'
+  ];
+
+  /* ── SYNTAX HIGHLIGHTING ── */
+  var KW_BLOCK  = /^(workspace|model|views|systemContext|container(?=\s)|component(?=\s)(?!.*=)|person|softwareSystem|autolayout|theme)(\b)/;
+  var KW_TYPE   = /\b(person|softwareSystem|container|component)\b/;
+  var KW_TAG    = /\btags\b/;
+  var KW_BANG   = /^(!impliedRelationships)/;
+  var KW_ID     = /^[a-zA-Z_][a-zA-Z0-9_]*(?=\s*[={]|\s*->)/;
+  var RE_STRING = /"[^"]*"/g;
+  var RE_ARROW  = /->/g;
+  var RE_CMT    = /\/\/.*/;
+
+  function escHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function highlightLine(raw) {
+    var trimmed = raw.trimLeft();
+
+    // Full-line comment
+    if (/^\/\//.test(trimmed)) {
+      return '<span class="t-cmt">' + escHtml(raw) + '</span>';
+    }
+
+    var result = escHtml(raw);
+
+    // Inline comment (preserve it separately)
+    var cmtMatch = raw.match(/\/\/.*/);
+    var pre = cmtMatch ? escHtml(raw.slice(0, cmtMatch.index)) : result;
+    var cmt = cmtMatch ? '<span class="t-cmt">' + escHtml(cmtMatch[0]) + '</span>' : '';
+
+    // Strings
+    pre = pre.replace(/&quot;[^&]*(?:&amp;|&lt;|&gt;|[^&])*?&quot;|"[^"]*"/g, function (m) {
+      return '<span class="t-str">' + m + '</span>';
+    });
+
+    // !impliedRelationships
+    pre = pre.replace(/(!impliedRelationships\b)/g, '<span class="t-bang">$1</span>');
+
+    // tags keyword
+    pre = pre.replace(/\b(tags)\b/g, '<span class="t-tag">$1</span>');
+
+    // types
+    pre = pre.replace(/\b(person|softwareSystem|container|component)\b/g, '<span class="t-type">$1</span>');
+
+    // keywords
+    pre = pre.replace(/\b(workspace|model|views|systemContext|autolayout|theme|include)\b/g, '<span class="t-kw">$1</span>');
+
+    // identifiers (word before = or ->)
+    pre = pre.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?==\s)/g, '<span class="t-id">$1</span>');
+
+    // arrow
+    pre = pre.replace(/(->)/g, '<span class="t-op">$1</span>');
+
+    return pre + cmt;
+  }
+
+  function renderDsl() {
+    var container = document.getElementById('dslCode');
+    if (!container) return;
+
+    var html = '';
+    DSL_TEXT.forEach(function (line, i) {
+      html += '<div class="dsl-line">'
+           + '<span class="dsl-num">' + (i + 1) + '</span>'
+           + '<span class="dsl-text">' + highlightLine(line) + '</span>'
+           + '</div>';
+    });
+    container.innerHTML = html;
+
+    // Print fallback
+    var printEl = document.getElementById('dslPrint');
+    if (printEl) printEl.textContent = DSL_TEXT.join('\n');
+  }
+
+  /* ── COPY TO CLIPBOARD ── */
+  window.copyDsl = function () {
+    var text = DSL_TEXT.join('\n');
+    var btn  = document.getElementById('dslCopyBtn');
+
+    function markCopied() {
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = 'Copy to Clipboard';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(markCopied).catch(function () {
+        fallbackCopy(text, markCopied);
+      });
+    } else {
+      fallbackCopy(text, markCopied);
+    }
+  };
+
+  function fallbackCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity  = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); cb(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  /* ── CHECKLIST ── */
+  var TOTAL   = 6;
+  var answers = new Array(TOTAL).fill(null);
+
+  window.arcRate = function (idx, pts, btn, tier) {
+    answers[idx] = pts;
+    var checkEl = document.querySelector('.arc-check[data-idx="' + idx + '"]');
+    checkEl.querySelectorAll('.arc-btn').forEach(function (b) {
+      b.classList.remove('sel-yes', 'sel-partial', 'sel-no');
+    });
+    btn.classList.add('sel-' + tier);
+    checkEl.classList.add('answered');
+    updateScore();
+  };
+
+  function updateScore() {
+    var answered = answers.filter(function (a) { return a !== null; }).length;
+    var score    = answers.reduce(function (s, a) { return s + (a !== null ? a : 0); }, 0);
+    document.getElementById('score-current').textContent  = score;
+    document.getElementById('score-answered').textContent = answered + ' / ' + TOTAL;
+    if (answered === TOTAL) { showResult(score); }
+  }
+
+  function showResult(score) {
+    var tier, desc, color;
+    if (score >= 10) {
+      tier  = 'Architecture Ready';
+      desc  = 'Your C4 model reflects the AI system you\'ve actually built. Share this with your team as the baseline.';
+      color = 'var(--green)';
+    } else if (score >= 6) {
+      tier  = 'Progressing';
+      desc  = 'The foundations are visible. The gaps are worth a conversation with your architecture team this week.';
+      color = 'var(--amber)';
+    } else if (score >= 3) {
+      tier  = 'Developing';
+      desc  = 'Start with the context level — adding the model provider costs one box and reveals three governance conversations.';
+      color = '#E07820';
+    } else {
+      tier  = 'Starting Out';
+      desc  = 'The DSL starter above is your fastest first step. Copy it, substitute your names, and your diagram improves immediately.';
+      color = 'var(--red)';
+    }
+
+    var resultEl = document.getElementById('score-result');
+    document.getElementById('result-tier').textContent  = tier;
+    document.getElementById('result-tier').style.color  = color;
+    document.getElementById('result-score').textContent = 'Score: ' + score + ' / 12';
+    document.getElementById('result-desc').textContent  = desc;
+    resultEl.classList.add('visible');
+    resultEl.style.borderColor = color;
+    document.getElementById('arc-disclaimer').style.display = 'block';
+    document.getElementById('reset-btn').style.display      = 'block';
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  window.resetChecklist = function () {
+    answers.fill(null);
+    document.querySelectorAll('.arc-btn').forEach(function (b) {
+      b.classList.remove('sel-yes', 'sel-partial', 'sel-no');
+    });
+    document.querySelectorAll('.arc-check').forEach(function (c) {
+      c.classList.remove('answered');
+    });
+    document.getElementById('score-current').textContent  = '0';
+    document.getElementById('score-answered').textContent = '0 / ' + TOTAL;
+    var resultEl = document.getElementById('score-result');
+    resultEl.classList.remove('visible');
+    resultEl.style.borderColor = '';
+    document.getElementById('arc-disclaimer').style.display = 'none';
+    document.getElementById('reset-btn').style.display      = 'none';
+  };
+
+  /* ── PRINT: swap visible block ── */
+  window.addEventListener('beforeprint', function () {
+    document.getElementById('dslCode').parentElement.style.display = 'none';
+    document.getElementById('dslPrint').style.display = 'block';
+  });
+  window.addEventListener('afterprint', function () {
+    document.getElementById('dslCode').parentElement.style.display = '';
+    document.getElementById('dslPrint').style.display = 'none';
+  });
+
+  /* ── INIT ── */
+  renderDsl();
+
+}());
+</script>
+
+</body>
+</html>
