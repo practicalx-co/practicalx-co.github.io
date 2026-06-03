@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 20 · The Stateless vs Stateful Decision Tool</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+<style>
+  /* ── DECISION TOOL SHELL ── */
+  .tool-shell {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .tool-progress {
+    padding: 20px 28px 16px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .progress-steps {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .progress-step {
+    flex: 1;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--border);
+    transition: background 0.35s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-step.done { background: #8064A2; }
+
+  .progress-step.current {
+    background: rgba(128,100,162,0.3);
+  }
+
+  .progress-step.current::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #8064A2;
+    animation: stepPulse 1.4s ease-in-out infinite;
+    border-radius: 3px;
+  }
+
+  @keyframes stepPulse {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+  }
+
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  /* ── QUESTION PANEL ── */
+  .tool-question {
+    padding: 32px 28px 28px;
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    animation: qFadeUp 0.3s ease both;
+  }
+
+  .tool-question.active { display: flex; }
+
+  @keyframes qFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-lens-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8064A2;
+  }
+
+  .q-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(18px, 2.2vw, 24px);
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+  }
+
+  .q-context {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-top: -8px;
+  }
+
+  /* ── RESPONSE CARDS ── */
+  .response-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .response-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 20px;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    text-align: left;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .response-card:hover {
+    border-color: rgba(128,100,162,0.4);
+    background: #F5F0FF;
+    transform: translateX(2px);
+  }
+
+  .response-card.selected {
+    border-color: #8064A2;
+    background: #EDE9FA;
+  }
+
+  .response-card-label {
+    font-weight: 600;
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .response-card.selected .response-card-label { color: #8064A2; }
+
+  .response-card-desc {
+    font-size: clamp(12px, 1.2vw, 13px);
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.45;
+  }
+
+  /* ── NEXT BUTTON ── */
+  .tool-next-row {
+    padding: 0 28px 24px;
+    display: none;
+  }
+
+  .tool-next-row.visible { display: block; }
+
+  .btn-next {
+    padding: 11px 28px;
+    background: #8064A2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .btn-next:hover { background: #6A5090; transform: translateY(-1px); }
+  .btn-next:active { transform: translateY(0); }
+
+  /* ── RECOMMENDATION SCREEN ── */
+  .tool-result {
+    display: none;
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px 28px;
+    animation: qFadeUp 0.4s ease both;
+  }
+
+  .tool-result.active { display: flex; }
+
+  .result-rec-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 28px 28px;
+    background: white;
+    border: 2px solid #8064A2;
+    border-radius: 12px;
+  }
+
+  .result-rec-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .result-rec-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(28px, 4vw, 42px);
+    color: #8064A2;
+    letter-spacing: -1.5px;
+    line-height: 1;
+  }
+
+  .result-rec-summary {
+    font-size: clamp(13px, 1.4vw, 15px);
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-weight: 300;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── REASONING SUMMARY ── */
+  .result-reasoning {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .reasoning-header {
+    padding: 14px 20px;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .reasoning-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 12px;
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+
+  .reasoning-row:last-child { border-bottom: none; }
+
+  .reasoning-lens {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #8064A2;
+    padding-top: 2px;
+  }
+
+  .reasoning-content { display: flex; flex-direction: column; gap: 2px; }
+
+  .reasoning-answer {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .reasoning-implication {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 500px) {
+    .reasoning-row { grid-template-columns: 1fr; gap: 4px; }
+    .reasoning-lens { padding-top: 0; }
+  }
+
+  /* ── RESULT BUTTONS ── */
+  .result-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-reset {
+    padding: 10px 22px;
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-reset:hover { border-color: #8064A2; color: #8064A2; }
+
+  .btn-scroll-ref {
+    padding: 10px 22px;
+    background: var(--accent-light);
+    border: 1px solid rgba(128,100,162,0.25);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-scroll-ref:hover { background: #DDD5F5; border-color: #8064A2; }
+
+  /* ── COMPARISON TABLE ── */
+  .comp-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 520px;
+    font-size: clamp(12px, 1.3vw, 14px);
+  }
+
+  /* Column headers */
+  .comp-table thead th {
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 1.4vw, 15px);
+    letter-spacing: -0.2px;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+
+  .comp-table thead th:first-child {
+    background: var(--surface-alt);
+    color: var(--text-light);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    width: 130px;
+  }
+
+  .th-stateless { background: #F4F3F0; color: var(--text-muted); }
+  .th-stateful  { background: #8064A2; color: white; }
+  .th-hybrid    { background: #2C2416; color: #E8E0F0; }
+
+  /* Row styling */
+  .comp-table tbody tr { border-bottom: 1px solid var(--border); }
+  .comp-table tbody tr:last-child { border-bottom: none; }
+  .comp-table tbody tr:nth-child(odd)  { background: white; }
+  .comp-table tbody tr:nth-child(even) { background: var(--surface-alt); }
+
+  .comp-table tbody tr:hover td { background: #F0EAF8; }
+
+  .comp-table td {
+    padding: 13px 18px;
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .comp-table td:first-child {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Highlight stateful column */
+  .comp-table td:nth-child(3) { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- BACK NAV -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 20 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">The Stateless vs Stateful<br>Decision Tool</div>
+    <div class="header-quote">Stateless or stateful. Most teams never decide deliberately.</div>
+    <div class="header-arc">Arc 4 · AI and Architecture · Make the AI agent memory decision deliberately.</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p>Most teams default to stateful AI agents without asking whether they should. This tool walks you through five lenses — financial, security, compliance, architectural complexity, and use case fit — and produces a recommendation based on your specific answers.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      Day 19 asked where AI agents sit in your C4 diagram. Day 20 asks a deeper architectural question: should those agents remember anything at all?
+    </div>
+
+    <!-- SECTION 1: THE DECISION TOOL -->
+    <div class="section" id="tool-section">
+      <div class="section-header">
+        <div class="section-badge badge-purple">🧭</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 1 of 2</div>
+          <div class="section-title" style="color:#8064A2;">The Decision Tool</div>
+        </div>
+      </div>
+
+      <p style="font-size:clamp(13px,1.4vw,15px);color:var(--text-muted);line-height:1.65;margin-bottom:20px;">Answer five questions. Get a recommendation built around your answers — not a generic one.</p>
+
+      <div class="tool-shell no-print">
+
+        <!-- PROGRESS -->
+        <div class="tool-progress">
+          <div class="progress-steps" id="progressSteps">
+            <div class="progress-step current" data-step="0"></div>
+            <div class="progress-step" data-step="1"></div>
+            <div class="progress-step" data-step="2"></div>
+            <div class="progress-step" data-step="3"></div>
+            <div class="progress-step" data-step="4"></div>
+          </div>
+          <div class="progress-label" id="progressLabel">Question 1 of 5</div>
+        </div>
+
+        <!-- ── QUESTION 1 ── -->
+        <div class="tool-question active" id="q0">
+          <div class="q-lens-label">Financial</div>
+          <div class="q-text">How would you describe the interaction pattern for this agent?</div>
+          <div class="q-context">This determines whether storing context delivers enough value to justify its ongoing cost.</div>
+          <div class="response-cards">
+            <button class="response-card" data-q="0" data-signal="stateless" onclick="selectResponse(0,0,this)">
+              <div class="response-card-label">High volume, short interactions</div>
+              <div class="response-card-desc">Many users, quick exchanges, one-and-done tasks</div>
+            </button>
+            <button class="response-card" data-q="0" data-signal="hybrid" onclick="selectResponse(0,1,this)">
+              <div class="response-card-label">Moderate volume, mixed duration</div>
+              <div class="response-card-desc">Some ongoing context would help but isn't essential</div>
+            </button>
+            <button class="response-card" data-q="0" data-signal="stateful" onclick="selectResponse(0,2,this)">
+              <div class="response-card-label">Lower volume, ongoing relationships</div>
+              <div class="response-card-desc">Deep context builds value over time for each user</div>
+            </button>
+          </div>
+        </div>
+        <div class="tool-next-row" id="next0"><button class="btn-next" onclick="nextQuestion(1)">Next →</button></div>
+
+        <!-- ── QUESTION 2 ── -->
+        <div class="tool-question" id="q1">
+          <div class="q-lens-label">Security</div>
+          <div class="q-text">How mature is your organisation's data governance for retained AI context?</div>
+          <div class="q-context">Stateful agents accumulate sensitive information. The blast radius grows with every session.</div>
+          <div class="response-cards">
+            <button class="response-card" data-q="1" data-signal="stateless" onclick="selectResponse(1,0,this)">
+              <div class="response-card-label">Not established yet</div>
+              <div class="response-card-desc">No formal policies for what agents can retain or how long they retain it</div>
+            </button>
+            <button class="response-card" data-q="1" data-signal="hybrid" onclick="selectResponse(1,1,this)">
+              <div class="response-card-label">Partially in place</div>
+              <div class="response-card-desc">Some policies exist but coverage is incomplete</div>
+            </button>
+            <button class="response-card" data-q="1" data-signal="stateful" onclick="selectResponse(1,2,this)">
+              <div class="response-card-label">Fully established</div>
+              <div class="response-card-desc">Clear policies, access controls, and audit trails for retained agent context</div>
+            </button>
+          </div>
+        </div>
+        <div class="tool-next-row" id="next1"><button class="btn-next" onclick="nextQuestion(2)">Next →</button></div>
+
+        <!-- ── QUESTION 3 ── -->
+        <div class="tool-question" id="q2">
+          <div class="q-lens-label">Privacy &amp; Compliance</div>
+          <div class="q-text">Has your compliance team reviewed the data retention implications of this agent?</div>
+          <div class="q-context">Stateful agents may create retention obligations under GDPR, HIPAA, or similar frameworks.</div>
+          <div class="response-cards">
+            <button class="response-card" data-q="2" data-signal="stateless" onclick="selectResponse(2,0,this)">
+              <div class="response-card-label">No — this hasn't been considered yet</div>
+              <div class="response-card-desc">Compliance hasn't been part of the agent design conversation</div>
+            </button>
+            <button class="response-card" data-q="2" data-signal="hybrid" onclick="selectResponse(2,1,this)">
+              <div class="response-card-label">In progress</div>
+              <div class="response-card-desc">Compliance review is underway but not complete</div>
+            </button>
+            <button class="response-card" data-q="2" data-signal="stateful" onclick="selectResponse(2,2,this)">
+              <div class="response-card-label">Yes — fully reviewed and approved</div>
+              <div class="response-card-desc">Retention policies, data residency, and expiry rules are documented and approved</div>
+            </button>
+          </div>
+        </div>
+        <div class="tool-next-row" id="next2"><button class="btn-next" onclick="nextQuestion(3)">Next →</button></div>
+
+        <!-- ── QUESTION 4 ── -->
+        <div class="tool-question" id="q3">
+          <div class="q-lens-label">Architectural Complexity</div>
+          <div class="q-text">Does your team have experience building and operating stateful AI agents?</div>
+          <div class="q-context">Stateful agents require memory management, session handling, context expiry, and drift detection.</div>
+          <div class="response-cards">
+            <button class="response-card" data-q="3" data-signal="stateless" onclick="selectResponse(3,0,this)">
+              <div class="response-card-label">No — this would be new territory</div>
+              <div class="response-card-desc">The team hasn't built stateful agents before</div>
+            </button>
+            <button class="response-card" data-q="3" data-signal="hybrid" onclick="selectResponse(3,1,this)">
+              <div class="response-card-label">Some experience</div>
+              <div class="response-card-desc">The team has partial experience and is building the capability</div>
+            </button>
+            <button class="response-card" data-q="3" data-signal="stateful" onclick="selectResponse(3,2,this)">
+              <div class="response-card-label">Yes — established capability</div>
+              <div class="response-card-desc">The team has built and operated stateful agents in production before</div>
+            </button>
+          </div>
+        </div>
+        <div class="tool-next-row" id="next3"><button class="btn-next" onclick="nextQuestion(4)">Next →</button></div>
+
+        <!-- ── QUESTION 5 ── -->
+        <div class="tool-question" id="q4">
+          <div class="q-lens-label">Use Case Fit</div>
+          <div class="q-text">Does this agent's core task genuinely require memory across sessions?</div>
+          <div class="q-context">Memory should be driven by the use case — not assumed as a default.</div>
+          <div class="response-cards">
+            <button class="response-card" data-q="4" data-signal="stateless" onclick="selectResponse(4,0,this)">
+              <div class="response-card-label">No — each interaction is independent</div>
+              <div class="response-card-desc">The task completes in a single session with no need for prior context</div>
+            </button>
+            <button class="response-card" data-q="4" data-signal="hybrid" onclick="selectResponse(4,1,this)">
+              <div class="response-card-label">Sometimes — context helps but isn't essential</div>
+              <div class="response-card-desc">Some continuity would improve the experience but the agent works without it</div>
+            </button>
+            <button class="response-card" data-q="4" data-signal="stateful" onclick="selectResponse(4,2,this)">
+              <div class="response-card-label">Yes — ongoing context is core to the value</div>
+              <div class="response-card-desc">The agent's value compounds over time through accumulated context</div>
+            </button>
+          </div>
+        </div>
+        <div class="tool-next-row" id="next4"><button class="btn-next" onclick="showResult()">See Recommendation →</button></div>
+
+        <!-- ── RESULT SCREEN ── -->
+        <div class="tool-result" id="toolResult">
+
+          <div class="result-rec-block">
+            <div class="result-rec-label">Recommendation</div>
+            <div class="result-rec-name" id="recName"></div>
+            <div class="result-rec-summary" id="recSummary"></div>
+          </div>
+
+          <div class="result-reasoning">
+            <div class="reasoning-header">Why this recommendation — based on your answers</div>
+            <div class="reasoning-row">
+              <div class="reasoning-lens">Financial</div>
+              <div class="reasoning-content">
+                <div class="reasoning-answer" id="r-ans-0"></div>
+                <div class="reasoning-implication" id="r-imp-0"></div>
+              </div>
+            </div>
+            <div class="reasoning-row">
+              <div class="reasoning-lens">Security</div>
+              <div class="reasoning-content">
+                <div class="reasoning-answer" id="r-ans-1"></div>
+                <div class="reasoning-implication" id="r-imp-1"></div>
+              </div>
+            </div>
+            <div class="reasoning-row">
+              <div class="reasoning-lens">Compliance</div>
+              <div class="reasoning-content">
+                <div class="reasoning-answer" id="r-ans-2"></div>
+                <div class="reasoning-implication" id="r-imp-2"></div>
+              </div>
+            </div>
+            <div class="reasoning-row">
+              <div class="reasoning-lens">Complexity</div>
+              <div class="reasoning-content">
+                <div class="reasoning-answer" id="r-ans-3"></div>
+                <div class="reasoning-implication" id="r-imp-3"></div>
+              </div>
+            </div>
+            <div class="reasoning-row">
+              <div class="reasoning-lens">Use Case</div>
+              <div class="reasoning-content">
+                <div class="reasoning-answer" id="r-ans-4"></div>
+                <div class="reasoning-implication" id="r-imp-4"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-buttons">
+            <button class="btn-reset" onclick="resetTool()">Start Again</button>
+            <button class="btn-scroll-ref" onclick="scrollToRef()">See the Reference Card ↓</button>
+          </div>
+
+        </div><!-- /tool-result -->
+
+      </div><!-- /tool-shell -->
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SECTION 2: COMPARISON TABLE -->
+    <div class="section" id="ref-section">
+      <div class="section-header">
+        <div class="section-badge badge-blue">📊</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 2 of 2</div>
+          <div class="section-title blue">Stateless vs Stateful vs Hybrid — At a Glance</div>
+        </div>
+      </div>
+
+      <p style="font-size:clamp(13px,1.4vw,15px);color:var(--text-muted);line-height:1.65;margin-bottom:16px;">A reference for your architecture team.</p>
+
+      <div class="comp-table-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="th-stateless">Stateless</th>
+              <th class="th-stateful">Stateful</th>
+              <th class="th-hybrid">Hybrid</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cost</td>
+              <td>Low — predictable, scales linearly</td>
+              <td>Higher — memory storage, retrieval, context window growth</td>
+              <td>Moderate — selective memory keeps costs manageable</td>
+            </tr>
+            <tr>
+              <td>Security Surface</td>
+              <td>Minimal — blast radius resets every session</td>
+              <td>Larger — grows with accumulated context over time</td>
+              <td>Controlled — defined memory scope limits exposure</td>
+            </tr>
+            <tr>
+              <td>Governance Overhead</td>
+              <td>Low — no retention policies needed</td>
+              <td>High — retention, expiry, access controls, audit trails</td>
+              <td>Medium — governance scoped to retained context types only</td>
+            </tr>
+            <tr>
+              <td>Architectural Complexity</td>
+              <td>Low — no session state to manage</td>
+              <td>High — memory management, drift detection, expiry policies</td>
+              <td>Medium — complexity contained to the memory layer</td>
+            </tr>
+            <tr>
+              <td>Use Case Fit</td>
+              <td>One-off tasks, high volume, independent interactions</td>
+              <td>Ongoing relationships, personalisation, multi-session workflows</td>
+              <td>Mixed environments, enterprise default, evolving use cases</td>
+            </tr>
+            <tr>
+              <td>Scalability</td>
+              <td>Excellent — horizontally scalable with no state overhead</td>
+              <td>Complex — state management adds scaling constraints</td>
+              <td>Good — stateless core scales freely, memory layer managed separately</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- CLOSING LINE -->
+      <div class="core-idea" style="margin-top:28px;">
+        <div class="pullquote">The right choice isn't stateful or stateless. It's whichever one your use case, your team, and your governance can actually support.</div>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div style="background:var(--accent-light);border:1px solid rgba(91,63,191,0.15);border-radius:10px;padding:18px 22px;font-size:clamp(12px,1.25vw,14px);color:var(--text-muted);line-height:1.65;margin-top:20px;">
+        This tool is a decision aid, not a technical specification. Architecture decisions should be validated with your engineering and security teams. For a deeper conversation about agentic AI architecture — <a href="https://www.linkedin.com/in/karthikmahadevan06/" target="_blank" rel="noopener">connect with me on LinkedIn</a>.
+      </div>
+
+    </div><!-- /section -->
+
+  </div><!-- /body -->
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section no-print">
+    <div class="progress-header">
+      <div class="progress-label">Series Progress</div>
+      <div class="progress-count">Day 20 / 30</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 67%"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 20 OF 30 · ARC 4 · AI AND ARCHITECTURE</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── DATA ── */
+
+  var QUESTIONS = [
+    {
+      answers: [
+        { label: 'High volume, short interactions',    signal: 'stateless' },
+        { label: 'Moderate volume, mixed duration',   signal: 'hybrid'    },
+        { label: 'Lower volume, ongoing relationships',signal: 'stateful' }
+      ],
+      implications: [
+        'Stateless is significantly cheaper at scale',
+        'Context costs are manageable with selective memory',
+        'Context value justifies storage and retrieval costs'
+      ]
+    },
+    {
+      answers: [
+        { label: 'Not established yet',  signal: 'stateless' },
+        { label: 'Partially in place',   signal: 'hybrid'    },
+        { label: 'Fully established',    signal: 'stateful'  }
+      ],
+      implications: [
+        'Stateless limits blast radius until governance matures',
+        'Hybrid lets you build governance incrementally',
+        'Your security posture supports stateful operation'
+      ]
+    },
+    {
+      answers: [
+        { label: "No — this hasn't been considered yet", signal: 'stateless' },
+        { label: 'In progress',                          signal: 'hybrid'    },
+        { label: 'Yes — fully reviewed and approved',    signal: 'stateful'  }
+      ],
+      implications: [
+        'Stateless avoids retention obligations until review is complete',
+        'Hybrid allows limited retention while review completes',
+        'Retention obligations are understood and managed'
+      ]
+    },
+    {
+      answers: [
+        { label: 'No — this would be new territory', signal: 'stateless' },
+        { label: 'Some experience',                  signal: 'hybrid'    },
+        { label: 'Yes — established capability',     signal: 'stateful'  }
+      ],
+      implications: [
+        'Stateless is the lower-risk starting point for the team',
+        'Hybrid builds capability without full stateful complexity',
+        'Your team can manage stateful operation reliably'
+      ]
+    },
+    {
+      answers: [
+        { label: 'No — each interaction is independent',            signal: 'stateless' },
+        { label: "Sometimes — context helps but isn't essential",   signal: 'hybrid'    },
+        { label: 'Yes — ongoing context is core to the value',      signal: 'stateful'  }
+      ],
+      implications: [
+        'Memory adds cost and complexity without adding value',
+        'Selective memory captures value without full commitment',
+        'Stateful is justified — the use case demands it'
+      ]
+    }
+  ];
+
+  var SCORES   = { stateless: 0, hybrid: 1, stateful: 2 };
+  var RECS     = {
+    stateless: {
+      name: 'Stateless',
+      summary: 'Based on your answers, a stateless agent is the right starting point. Lower cost, smaller blast radius, and less governance overhead — without sacrificing capability for this use case.'
+    },
+    hybrid: {
+      name: 'Hybrid',
+      summary: 'Based on your answers, a hybrid approach makes most sense. Stateless by default with selective memory for specific context types — the most practical enterprise answer for your situation.'
+    },
+    stateful: {
+      name: 'Stateful',
+      summary: 'Based on your answers, a stateful agent is justified for this use case. Your team has the maturity and governance in place to manage the additional complexity responsibly.'
+    }
+  };
+
+  /* ── STATE ── */
+  var selected = new Array(5).fill(null); // index of selected answer per question
+
+  /* ── SELECTION ── */
+  window.selectResponse = function (qIdx, aIdx, btn) {
+    // Deselect siblings
+    var cards = btn.closest('.response-cards').querySelectorAll('.response-card');
+    cards.forEach(function (c) { c.classList.remove('selected'); });
+    btn.classList.add('selected');
+    selected[qIdx] = aIdx;
+
+    // Show Next button
+    document.getElementById('next' + qIdx).classList.add('visible');
+  };
+
+  /* ── NAVIGATION ── */
+  window.nextQuestion = function (toIdx) {
+    // Hide current question + next button
+    var fromIdx = toIdx - 1;
+    document.getElementById('q' + fromIdx).classList.remove('active');
+    document.getElementById('next' + fromIdx).classList.remove('visible');
+
+    // Show next question
+    document.getElementById('q' + toIdx).classList.add('active');
+
+    // Update progress
+    updateProgress(toIdx);
+
+    // Scroll tool into view
+    document.getElementById('tool-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  function updateProgress(currentIdx) {
+    var steps = document.querySelectorAll('.progress-step');
+    steps.forEach(function (step, i) {
+      step.classList.remove('done', 'current');
+      if (i < currentIdx)      step.classList.add('done');
+      else if (i === currentIdx) step.classList.add('current');
+    });
+    document.getElementById('progressLabel').textContent = 'Question ' + (currentIdx + 1) + ' of 5';
+  }
+
+  /* ── SHOW RESULT ── */
+  window.showResult = function () {
+    // Hide last question and next button
+    document.getElementById('q4').classList.remove('active');
+    document.getElementById('next4').classList.remove('visible');
+
+    // Mark all steps done
+    document.querySelectorAll('.progress-step').forEach(function (s) {
+      s.classList.remove('current');
+      s.classList.add('done');
+    });
+    document.getElementById('progressLabel').textContent = 'Complete';
+
+    // Calculate score
+    var score = 0;
+    selected.forEach(function (aIdx, qIdx) {
+      if (aIdx !== null) {
+        score += SCORES[QUESTIONS[qIdx].answers[aIdx].signal];
+      }
+    });
+
+    // Determine recommendation
+    var rec = score <= 3 ? 'stateless' : score <= 6 ? 'hybrid' : 'stateful';
+    var recData = RECS[rec];
+
+    document.getElementById('recName').textContent    = recData.name;
+    document.getElementById('recSummary').textContent = recData.summary;
+
+    // Build reasoning rows
+    selected.forEach(function (aIdx, qIdx) {
+      if (aIdx === null) return;
+      var answer = QUESTIONS[qIdx].answers[aIdx];
+      var impl   = QUESTIONS[qIdx].implications[aIdx];
+      document.getElementById('r-ans-' + qIdx).textContent = answer.label;
+      document.getElementById('r-imp-' + qIdx).textContent = '→ ' + impl;
+    });
+
+    // Show result panel
+    document.getElementById('toolResult').classList.add('active');
+    document.getElementById('toolResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  /* ── RESET ── */
+  window.resetTool = function () {
+    selected.fill(null);
+
+    // Hide result
+    document.getElementById('toolResult').classList.remove('active');
+
+    // Show Q1
+    for (var i = 0; i < 5; i++) {
+      document.getElementById('q' + i).classList.remove('active');
+      document.getElementById('next' + i).classList.remove('visible');
+      document.querySelectorAll('#q' + i + ' .response-card').forEach(function (c) {
+        c.classList.remove('selected');
+      });
+    }
+
+    document.getElementById('q0').classList.add('active');
+    updateProgress(0);
+    document.getElementById('tool-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  /* ── SCROLL TO REFERENCE ── */
+  window.scrollToRef = function () {
+    document.getElementById('ref-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+}());
+</script>
+
+</body>
+</html>
