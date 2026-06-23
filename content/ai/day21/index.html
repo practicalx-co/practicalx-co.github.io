@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PracticalX Toolkit — Day 21 · The AI Infrastructure Cost Calculator</title>
+<link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/content/ai/toolkit.css">
+<style>
+  /* ── CALCULATOR TABLE ── */
+  .calc-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .calc-table {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    font-size: clamp(12px, 1.3vw, 14px);
+  }
+
+  .calc-table thead th {
+    padding: 12px 14px;
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .calc-table th.col-total { text-align: right; }
+
+  .calc-table tbody tr:nth-child(odd)  { background: white; }
+  .calc-table tbody tr:nth-child(even) { background: var(--surface-alt); }
+
+  .calc-table td {
+    padding: 8px 10px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .calc-table tbody tr:last-child td { border-bottom: none; }
+
+  .cell-input {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 6px;
+    padding: 8px 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .cell-input:hover { background: rgba(128,100,162,0.07); }
+  .cell-input:focus { border-color: #8064A2; background: white; }
+
+  .row-name { min-width: 160px; }
+  .row-qty  { min-width: 70px; text-align: right; }
+  .row-unit { min-width: 90px; }
+
+  .price-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: white;
+    padding-left: 9px;
+    min-width: 96px;
+    transition: border-color 0.15s;
+  }
+
+  .price-input-wrap .input-prefix {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-light);
+  }
+
+  .price-input-wrap .row-price { border: none; text-align: right; }
+  .price-input-wrap .row-price:hover { background: transparent; }
+  .price-input-wrap:focus-within { border-color: #8064A2; }
+
+  .row-total-cell { text-align: right; white-space: nowrap; }
+  .row-total {
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: var(--text);
+  }
+
+  .row-del-cell { text-align: right; width: 1%; }
+
+  .row-delete {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text-light);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .row-delete:hover:not(:disabled) { border-color: #9B1C1C; color: #9B1C1C; background: var(--red-light); }
+  .row-delete:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-add-row {
+    margin-top: 14px;
+    padding: 10px 18px;
+    background: white;
+    border: 1px dashed var(--border-strong);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: #8064A2;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-add-row:hover { border-color: #8064A2; border-style: solid; background: #F5F0FF; }
+
+  /* ── TOTALS PANEL ── */
+  .totals-panel {
+    background: var(--surface-alt);
+    border-radius: 10px;
+    padding: 22px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .totals-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .totals-label { font-size: clamp(13px, 1.4vw, 15px); color: var(--text-muted); }
+  .totals-value {
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: clamp(14px, 1.5vw, 16px);
+    color: var(--text);
+  }
+
+  .totals-row.main { padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
+  .totals-row.main .totals-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(14px, 1.5vw, 16px);
+    color: var(--text);
+  }
+  .totals-row.main .totals-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(24px, 3vw, 32px);
+    color: #8064A2;
+    letter-spacing: -0.5px;
+  }
+
+  /* ── SCALING PANEL ── */
+  .scaling-panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+
+  .scaling-header { padding: 16px 22px 12px; border-bottom: 1px solid var(--border); }
+  .scaling-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(14px, 1.5vw, 16px);
+    color: var(--text);
+  }
+  .scaling-subtitle { font-size: clamp(12px, 1.3vw, 13px); color: var(--text-muted); margin-top: 2px; }
+
+  .scaling-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 22px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .scaling-row:last-child { border-bottom: none; }
+
+  .scaling-label { font-size: clamp(12px, 1.3vw, 14px); color: var(--text-muted); }
+  .scaling-pct { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-light); }
+  .scaling-values { font-family: 'DM Mono', monospace; font-size: clamp(12px, 1.3vw, 14px); color: var(--text); }
+
+  .scaling-row.likely {
+    background: #F5F0FF;
+    border-left: 3px solid #8064A2;
+    padding-left: 19px;
+  }
+  .scaling-row.likely .scaling-label,
+  .scaling-row.likely .scaling-values { font-weight: 700; color: #5A4080; }
+
+  .calc-disclaimer {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-top: 14px;
+    font-style: italic;
+  }
+
+  /* ── ACTION BUTTONS ── */
+  .calc-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 22px; }
+
+  .btn-generate-receipt {
+    padding: 13px 26px;
+    background: #8064A2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(128,100,162,0.3);
+  }
+  .btn-generate-receipt:hover { background: #6F5590; transform: translateY(-1px); }
+
+  .btn-generate-costmap {
+    padding: 13px 26px;
+    background: white;
+    color: #8064A2;
+    border: 1.5px solid #8064A2;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-generate-costmap:hover { background: #F5F0FF; }
+
+  /* ── GENERATED BLOCKS ── */
+  .generated-block { display: none; }
+  .generated-block.visible { display: block; animation: fadeUpIn 0.4s ease both; }
+
+  @keyframes fadeUpIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RECEIPT ── */
+  .receipt-outer { display: flex; justify-content: center; }
+
+  .receipt-card {
+    width: 100%;
+    max-width: 380px;
+    background: #FFFDF7;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    padding: 28px 24px;
+    font-family: 'DM Mono', monospace;
+    color: #2A2A2A;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+
+  .receipt-header { text-align: center; margin-bottom: 14px; }
+  .receipt-title { font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+  .receipt-sub, .receipt-table-label { font-size: 10px; color: #666; margin-top: 4px; }
+
+  .receipt-divider { border-top: 1px dashed #B0B0B0; margin: 12px 0; }
+
+  .receipt-cols, .receipt-item-row {
+    display: grid;
+    grid-template-columns: 2.2fr 0.9fr 1fr 1fr;
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .receipt-cols { font-weight: 700; letter-spacing: 0.5px; color: #555; }
+  .receipt-item-row { font-size: 11px; padding: 3px 0; }
+
+  .receipt-cols span:first-child,
+  .receipt-item-row span:first-child {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .receipt-cols span:nth-child(2), .receipt-cols span:nth-child(3), .receipt-cols span:nth-child(4),
+  .receipt-item-row span:nth-child(2), .receipt-item-row span:nth-child(3), .receipt-item-row span:nth-child(4) {
+    text-align: right;
+  }
+
+  .receipt-total-row { display: flex; justify-content: space-between; font-size: 11.5px; padding: 3px 0; }
+  .receipt-total-row span:last-child { font-weight: 700; }
+
+  .receipt-scaling-header, .receipt-scaling-row {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 6px;
+    font-size: 10px;
+    padding: 3px 0;
+  }
+  .receipt-scaling-header { font-weight: 700; color: #555; }
+  .receipt-scaling-row span:nth-child(2), .receipt-scaling-row span:nth-child(3),
+  .receipt-scaling-header span:nth-child(2), .receipt-scaling-header span:nth-child(3) { text-align: right; }
+  .receipt-scaling-row.bold { font-weight: 700; }
+
+  .receipt-footer { text-align: center; font-size: 11px; line-height: 1.7; margin-top: 4px; }
+  .receipt-meta { font-size: 9px; color: #888; margin-top: 10px; letter-spacing: 0.5px; }
+
+  .btn-download {
+    display: block;
+    margin: 18px auto 0;
+    padding: 10px 22px;
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-download:hover { border-color: #8064A2; color: #8064A2; }
+
+  /* ── COST MAP ── */
+  .costmap-capture {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .costmap-caption {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .totals-panel { padding: 18px 18px; }
+    .scaling-row { padding: 12px 16px; }
+    .scaling-row.likely { padding-left: 13px; }
+    .scaling-header { padding: 14px 16px 10px; }
+    .calc-actions { flex-direction: column; }
+    .calc-actions button { width: 100%; }
+    .receipt-card { padding: 22px 14px; }
+    .receipt-cols, .receipt-item-row { grid-template-columns: 1.8fr 0.8fr 0.9fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BACK NAV -->
+<div class="back-nav no-print">
+  <a href="/content/ai/" class="back-link">
+    <span class="back-arrow">←</span>
+    <span>Back to Learning AI Out Loud</span>
+  </a>
+  <a href="/" class="back-home">PracticalX Home</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">XE</div>
+      <div class="brand-meta">
+        <div class="brand-name">Practical<span>X</span></div>
+        <div class="brand-series">X = Learning AI Out Loud</div>
+      </div>
+    </div>
+    <div class="header-day">Day 21 of 30 · Knowledge Hub Toolkit</div>
+    <div class="header-title">The AI Infrastructure Cost Calculator</div>
+    <div class="header-quote">The engineers who bring a three-year TCO to the budget conversation are the ones worth listening to.</div>
+    <div class="header-arc">Arc 4 · AI and Architecture · Build your own bill of materials.</div>
+  </div>
+
+  <!-- INTRO BAND -->
+  <div class="intro-band">
+    <p>Most AI infrastructure budgets are built around one cost category — the model API bill. This calculator helps you build the complete picture. Start with the five pre-loaded categories, edit them to match your context, add your own rows, and generate your personalised bill of materials.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SERIES CONNECT -->
+    <div class="series-connect">
+      Day 20 asked whether your agents should remember anything. Day 21 asks the question budget owners actually care about: what does all of this cost to run — this month, this year, and over three?
+    </div>
+
+    <!-- SECTION 1: THE COST CALCULATOR -->
+    <div class="section" id="calc-section">
+      <div class="section-header">
+        <div class="section-badge badge-purple">🧮</div>
+        <div class="section-title-block">
+          <div class="section-label">Section 1 of 3</div>
+          <div class="section-title" style="color:#8064A2;">The Cost Calculator</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(15px,1.7vw,17px);color:var(--text);margin-bottom:6px;">Your bill of materials</div>
+        <p style="font-size:clamp(13px,1.4vw,15px);color:var(--text-muted);line-height:1.65;">Edit the pre-loaded rows, delete what doesn't apply, and add your own components. Every number updates in real time.</p>
+      </div>
+
+      <div class="calc-table-wrap">
+        <table class="calc-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Qty</th>
+              <th>Unit</th>
+              <th>Unit Price</th>
+              <th class="col-total">Monthly Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="cost-tbody"><!-- rows rendered by JS --></tbody>
+        </table>
+      </div>
+
+      <button type="button" class="btn-add-row no-print" onclick="window.addCostRow(true)">+ Add component</button>
+
+      <!-- RUNNING TOTALS -->
+      <div class="totals-panel">
+        <div class="totals-row main">
+          <span class="totals-label">Monthly subtotal</span>
+          <span class="totals-value" id="subtotal-monthly">$0.00</span>
+        </div>
+        <div class="totals-row">
+          <span class="totals-label">× 12 = Year 1 total</span>
+          <span class="totals-value" id="total-year1">$0.00</span>
+        </div>
+        <div class="totals-row">
+          <span class="totals-label">× 36 = 3-Year total</span>
+          <span class="totals-value" id="total-year3">$0.00</span>
+        </div>
+      </div>
+
+      <!-- UNPLANNED SCALING -->
+      <div class="scaling-panel">
+        <div class="scaling-header">
+          <div class="scaling-title">Unplanned scaling buffer</div>
+          <div class="scaling-subtitle">How much extra should you plan for?</div>
+        </div>
+        <div class="scaling-row">
+          <span class="scaling-label">Conservative <span class="scaling-pct">(15%)</span></span>
+          <span class="scaling-values"><span id="scale-15-y1">+$0.00</span> Year 1 · <span id="scale-15-y3">+$0.00</span> 3-Year</span>
+        </div>
+        <div class="scaling-row">
+          <span class="scaling-label">Moderate <span class="scaling-pct">(18%)</span></span>
+          <span class="scaling-values"><span id="scale-18-y1">+$0.00</span> Year 1 · <span id="scale-18-y3">+$0.00</span> 3-Year</span>
+        </div>
+        <div class="scaling-row likely">
+          <span class="scaling-label">Likely <span class="scaling-pct">(20%)</span></span>
+          <span class="scaling-values"><span id="scale-20-y1">+$0.00</span> Year 1 · <span id="scale-20-y3">+$0.00</span> 3-Year</span>
+        </div>
+        <div class="scaling-row">
+          <span class="scaling-label">Reality <span class="scaling-pct">(25%)</span></span>
+          <span class="scaling-values"><span id="scale-25-y1">+$0.00</span> Year 1 · <span id="scale-25-y3">+$0.00</span> 3-Year</span>
+        </div>
+      </div>
+
+      <p class="calc-disclaimer">Unit prices are illustrative starting points. Actual costs vary by provider, tier, and usage pattern. Verify current pricing with your providers before budgeting.</p>
+
+      <div class="calc-actions no-print">
+        <button type="button" class="btn-generate-receipt" onclick="window.generateReceipt()">Generate my receipt</button>
+        <button type="button" class="btn-generate-costmap" onclick="window.generateCostMap()">Generate my cost map</button>
+      </div>
+    </div>
+
+    <!-- SECTION 2: YOUR RECEIPT -->
+    <div class="generated-block" id="receipt-block">
+      <div class="divider"></div>
+      <div class="section" id="receipt-section">
+        <div class="section-header">
+          <div class="section-badge badge-purple">🧾</div>
+          <div class="section-title-block">
+            <div class="section-label">Section 2 of 3</div>
+            <div class="section-title" style="color:#8064A2;">Your Receipt</div>
+          </div>
+        </div>
+
+        <div class="receipt-outer">
+          <div class="receipt-card" id="receipt-capture">
+            <div class="receipt-header">
+              <div class="receipt-title">THE AI INFRASTRUCTURE CAFÉ</div>
+              <div class="receipt-sub">Chez Production Scale · Est. 2024</div>
+              <div class="receipt-table-label">Table: POC → Production</div>
+            </div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-cols">
+              <span>ITEM</span><span>QTY</span><span>UNIT</span><span>MONTHLY</span>
+            </div>
+            <div class="receipt-divider"></div>
+            <div id="receipt-items"><!-- rows rendered by JS --></div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-total-row"><span>Monthly subtotal</span><span id="r-subtotal">$0.00</span></div>
+            <div class="receipt-total-row"><span>× 12 months (Year 1)</span><span id="r-year1">$0.00</span></div>
+            <div class="receipt-total-row"><span>× 36 months (3-Year)</span><span id="r-year3">$0.00</span></div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-scaling-header"><span></span><span>YR 1 EXTRA</span><span>3YR EXTRA</span></div>
+            <div class="receipt-scaling-row"><span>Conservative (15%)</span><span id="r-15-y1">+$0.00</span><span id="r-15-y3">+$0.00</span></div>
+            <div class="receipt-scaling-row"><span>Moderate (18%)</span><span id="r-18-y1">+$0.00</span><span id="r-18-y3">+$0.00</span></div>
+            <div class="receipt-scaling-row bold"><span>Likely (20%)</span><span id="r-20-y1">+$0.00</span><span id="r-20-y3">+$0.00</span></div>
+            <div class="receipt-scaling-row"><span>Reality (25%)</span><span id="r-25-y1">+$0.00</span><span id="r-25-y3">+$0.00</span></div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-footer">
+              <div>None of these line items were in the original budget.</div>
+              <div>Thank you for your deployment.</div>
+              <div>Please tip your DevOps team.</div>
+              <div class="receipt-meta">PracticalX · Learning AI Out Loud · Day 21</div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-download no-print" onclick="window.downloadReceipt()">Download receipt as image</button>
+      </div>
+    </div>
+
+    <!-- SECTION 3: YOUR COST MAP -->
+    <div class="generated-block" id="costmap-block">
+      <div class="divider"></div>
+      <div class="section" id="costmap-section">
+        <div class="section-header">
+          <div class="section-badge badge-purple">🗺️</div>
+          <div class="section-title-block">
+            <div class="section-label">Section 3 of 3</div>
+            <div class="section-title" style="color:#8064A2;">Your Cost Map</div>
+          </div>
+        </div>
+
+        <p style="font-size:clamp(13px,1.4vw,15px);color:var(--text-muted);line-height:1.65;">Each component is matched to where it actually runs — based on what you called it.</p>
+
+        <div class="costmap-capture" id="costmap-capture">
+          <div class="costmap-caption">Your components, mapped to the infrastructure that runs them</div>
+          <svg id="costmap-svg" viewBox="0 0 800 460" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+            <defs>
+              <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#8064A2"></path>
+              </marker>
+            </defs>
+
+            <g id="costmap-static">
+              <!-- static connectors -->
+              <line x1="550" y1="70"  x2="420" y2="150" stroke="#C8C8D8" stroke-width="1.5"></line>
+              <line x1="550" y1="70"  x2="660" y2="150" stroke="#C8C8D8" stroke-width="1.5"></line>
+              <line x1="420" y1="230" x2="400" y2="290" stroke="#C8C8D8" stroke-width="1.5"></line>
+              <line x1="660" y1="250" x2="560" y2="290" stroke="#C8C8D8" stroke-width="1.5"></line>
+              <line x1="660" y1="250" x2="715" y2="290" stroke="#C8C8D8" stroke-width="1.5"></line>
+
+              <!-- top: model provider -->
+              <rect x="400" y="20" width="300" height="50" rx="8" fill="#EDE9FA" stroke="#8064A2" stroke-width="1.5"></rect>
+              <text x="550" y="50" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#5A4080">Model Provider</text>
+
+              <!-- middle: orchestration -->
+              <rect x="330" y="150" width="180" height="80" rx="8" fill="#EDE9FA" stroke="#8064A2" stroke-width="1.5"></rect>
+              <text x="420" y="184" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#5A4080">Orchestration</text>
+              <text x="420" y="202" text-anchor="middle" font-family="'DM Mono', monospace" font-size="9" letter-spacing="1" fill="#8064A2">CONTAINER</text>
+
+              <!-- middle: agent container -->
+              <rect x="540" y="150" width="240" height="100" rx="8" fill="#EDE9FA" stroke="#8064A2" stroke-width="1.5"></rect>
+              <text x="660" y="174" text-anchor="middle" font-family="Syne, sans-serif" font-weight="700" font-size="14" fill="#5A4080">Agent Container</text>
+              <rect x="555" y="190" width="60" height="26" rx="5" fill="#FFFFFF" stroke="#8064A2" stroke-width="1"></rect>
+              <text x="585" y="207" text-anchor="middle" font-family="'DM Mono', monospace" font-size="9" fill="#8064A2">Agent</text>
+              <rect x="625" y="190" width="60" height="26" rx="5" fill="#FFFFFF" stroke="#8064A2" stroke-width="1"></rect>
+              <text x="655" y="207" text-anchor="middle" font-family="'DM Mono', monospace" font-size="9" fill="#8064A2">Agent</text>
+              <rect x="695" y="190" width="60" height="26" rx="5" fill="#FFFFFF" stroke="#8064A2" stroke-width="1"></rect>
+              <text x="725" y="207" text-anchor="middle" font-family="'DM Mono', monospace" font-size="9" fill="#8064A2">Agent</text>
+
+              <!-- bottom: model container, vector db, observability -->
+              <rect x="330" y="290" width="140" height="60" rx="8" fill="#F4F3F0" stroke="#C8C8D8" stroke-width="1.5"></rect>
+              <text x="400" y="325" text-anchor="middle" font-family="Syne, sans-serif" font-weight="600" font-size="13" fill="#6B6B80">Model Container</text>
+
+              <rect x="490" y="290" width="140" height="60" rx="8" fill="#F4F3F0" stroke="#C8C8D8" stroke-width="1.5"></rect>
+              <text x="560" y="325" text-anchor="middle" font-family="Syne, sans-serif" font-weight="600" font-size="13" fill="#6B6B80">Vector DB</text>
+
+              <rect x="650" y="290" width="130" height="60" rx="8" fill="#F4F3F0" stroke="#C8C8D8" stroke-width="1.5"></rect>
+              <text x="715" y="325" text-anchor="middle" font-family="Syne, sans-serif" font-weight="600" font-size="13" fill="#6B6B80">Observability</text>
+            </g>
+
+            <g id="costmap-dynamic"><!-- pills + arrows rendered by JS --></g>
+          </svg>
+        </div>
+
+        <button type="button" class="btn-download no-print" onclick="window.downloadCostMap()">Download cost map as image</button>
+      </div>
+    </div>
+
+    <!-- CLOSING LINE -->
+    <div class="core-idea">
+      <div class="pullquote">The engineers who bring a three-year TCO to the budget conversation are the ones worth listening to.</div>
+    </div>
+
+    <!-- FINAL DISCLAIMER -->
+    <div class="disclaimer">
+      <div class="disclaimer-icon">⚠️</div>
+      <div class="disclaimer-content">
+        <div class="disclaimer-title">This is a planning tool, not a financial model</div>
+        <div class="disclaimer-text">
+          <p>Costs vary significantly by provider, region, usage pattern, and negotiated rates. Use this as a starting point for the conversation — not the final number.</p>
+          <p>For a more detailed cost modelling exercise — <a href="https://www.linkedin.com/in/karthikmahadevan06/" target="_blank" rel="noopener">connect with me on LinkedIn</a>.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-section no-print">
+    <div class="progress-header">
+      <div class="progress-label">Series Progress</div>
+      <div class="progress-count">Day 21 / 30</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 70%"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="footer-brand-name">Practical<span>X</span></div>
+      <div class="footer-series">This month · X = Learning AI Out Loud</div>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/karthikmahadevan06/" class="footer-link">Connect on LinkedIn → <span>Karthik Mahadevan</span></a>
+      <a href="https://drive.google.com/drive/folders/1LJx-lUazxxPV39EObD6vvGEqAYsWJo3c" class="footer-link">PracticalX Knowledge Hub → <span>Google Drive</span></a>
+      <div class="footer-day">DAY 21 OF 30 · ARC 4 · AI AND ARCHITECTURE</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">Save as PDF ↓</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ── CONFIG ── */
+  var SCALING_TIERS = [
+    { key: '15', pct: 15 },
+    { key: '18', pct: 18 },
+    { key: '20', pct: 20 },
+    { key: '25', pct: 25 }
+  ];
+
+  var INITIAL_ROWS = [
+    { name: 'Inference API calls',     qty: 10000, unit: 'calls/mo',     price: 0.07  },
+    { name: 'Context window growth',   qty: 50000, unit: 'tokens/mo',    price: 0.005 },
+    { name: 'Vector DB + embeddings',  qty: 1,     unit: 'instance/mo',  price: 400   },
+    { name: 'Orchestration compute',   qty: 3,     unit: 'agents/mo',    price: 150   },
+    { name: 'Observability + logging', qty: 1,     unit: 'instance/mo',  price: 200   }
+  ];
+
+  var tbody = document.getElementById('cost-tbody');
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  /* ── FORMATTING ── */
+  function fmt(n) {
+    n = isFinite(n) ? n : 0;
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtQty(n) {
+    n = isFinite(n) ? n : 0;
+    return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
+  function truncate(str, max) {
+    return str.length > max ? str.slice(0, max - 1) + '…' : str;
+  }
+
+  /* ── ROW RENDERING ── */
+  function buildRow(data) {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><input type="text" class="cell-input row-name" placeholder="Component name" aria-label="Component name" autocomplete="off" spellcheck="false"></td>' +
+      '<td><input type="number" class="cell-input row-qty" placeholder="0" min="0" step="any" aria-label="Quantity"></td>' +
+      '<td><input type="text" class="cell-input row-unit" placeholder="e.g. /mo" aria-label="Unit" autocomplete="off" spellcheck="false"></td>' +
+      '<td><div class="price-input-wrap"><span class="input-prefix">$</span><input type="number" class="cell-input row-price" placeholder="0.00" min="0" step="any" aria-label="Unit price in dollars"></div></td>' +
+      '<td class="row-total-cell"><span class="row-total">$0.00</span></td>' +
+      '<td class="row-del-cell"><button type="button" class="row-delete" aria-label="Remove component" onclick="window.deleteCostRow(this)">&times;</button></td>';
+
+    tr.querySelector('.row-name').value  = data.name  || '';
+    tr.querySelector('.row-qty').value   = (data.qty   != null) ? data.qty   : '';
+    tr.querySelector('.row-unit').value  = data.unit  || '';
+    tr.querySelector('.row-price').value = (data.price != null) ? data.price : '';
+
+    return tr;
+  }
+
+  function updateDeleteButtons() {
+    var rows = tbody.querySelectorAll('tr');
+    var disable = rows.length <= 1;
+    rows.forEach(function (tr) {
+      tr.querySelector('.row-delete').disabled = disable;
+    });
+  }
+
+  window.addCostRow = function (focus) {
+    var tr = buildRow({});
+    tbody.appendChild(tr);
+    updateDeleteButtons();
+    recalc();
+    if (focus) {
+      var nameInput = tr.querySelector('.row-name');
+      tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nameInput.focus();
+    }
+  };
+
+  window.deleteCostRow = function (btn) {
+    if (tbody.querySelectorAll('tr').length <= 1) return;
+    var tr = btn.closest('tr');
+    tr.parentNode.removeChild(tr);
+    updateDeleteButtons();
+    recalc();
+  };
+
+  /* ── READ ROW DATA ── */
+  function readRows() {
+    return Array.prototype.map.call(tbody.querySelectorAll('tr'), function (tr) {
+      var qty   = Math.max(0, parseFloat(tr.querySelector('.row-qty').value)   || 0);
+      var price = Math.max(0, parseFloat(tr.querySelector('.row-price').value) || 0);
+      return {
+        name:  tr.querySelector('.row-name').value.trim() || 'Untitled component',
+        qty:   qty,
+        unit:  tr.querySelector('.row-unit').value.trim() || '—',
+        price: price,
+        total: qty * price
+      };
+    });
+  }
+
+  /* ── CALCULATIONS ── */
+  function recalc() {
+    var rows = readRows();
+    var trs  = tbody.querySelectorAll('tr');
+
+    rows.forEach(function (row, i) {
+      trs[i].querySelector('.row-total').textContent = fmt(row.total);
+    });
+
+    var subtotal = rows.reduce(function (sum, r) { return sum + r.total; }, 0);
+    var year1 = subtotal * 12;
+    var year3 = subtotal * 36;
+
+    document.getElementById('subtotal-monthly').textContent = fmt(subtotal);
+    document.getElementById('total-year1').textContent      = fmt(year1);
+    document.getElementById('total-year3').textContent      = fmt(year3);
+
+    SCALING_TIERS.forEach(function (tier) {
+      var extraY1 = year1 * tier.pct / 100;
+      var extraY3 = year3 * tier.pct / 100;
+      document.getElementById('scale-' + tier.key + '-y1').textContent = '+' + fmt(extraY1);
+      document.getElementById('scale-' + tier.key + '-y3').textContent = '+' + fmt(extraY3);
+    });
+
+    return { rows: rows, subtotal: subtotal, year1: year1, year3: year3 };
+  }
+
+  /* ── INIT ── */
+  INITIAL_ROWS.forEach(function (data) { tbody.appendChild(buildRow(data)); });
+  updateDeleteButtons();
+  recalc();
+
+  tbody.addEventListener('input', recalc);
+
+  /* ── RECEIPT GENERATION ── */
+  window.generateReceipt = function () {
+    var data = recalc();
+
+    var itemsEl = document.getElementById('receipt-items');
+    itemsEl.innerHTML = '';
+    data.rows.forEach(function (row) {
+      var div = document.createElement('div');
+      div.className = 'receipt-item-row';
+      div.innerHTML = '<span></span><span></span><span></span><span></span>';
+      var cells = div.querySelectorAll('span');
+      cells[0].textContent = row.name;
+      cells[1].textContent = fmtQty(row.qty);
+      cells[2].textContent = row.unit;
+      cells[3].textContent = fmt(row.total);
+      itemsEl.appendChild(div);
+    });
+
+    document.getElementById('r-subtotal').textContent = fmt(data.subtotal);
+    document.getElementById('r-year1').textContent     = fmt(data.year1);
+    document.getElementById('r-year3').textContent     = fmt(data.year3);
+
+    SCALING_TIERS.forEach(function (tier) {
+      var extraY1 = data.year1 * tier.pct / 100;
+      var extraY3 = data.year3 * tier.pct / 100;
+      document.getElementById('r-' + tier.key + '-y1').textContent = '+' + fmt(extraY1);
+      document.getElementById('r-' + tier.key + '-y3').textContent = '+' + fmt(extraY3);
+    });
+
+    var block = document.getElementById('receipt-block');
+    block.classList.add('visible');
+    document.getElementById('receipt-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  /* ── COST MAP GENERATION ── */
+  var ARCH_TARGETS = {
+    'model-provider':  { anchor: { x: 400, y: 45  } },
+    'orchestration':   { anchor: { x: 330, y: 190 } },
+    'agent-container': { anchor: { x: 540, y: 200 } },
+    'vector-db':       { anchor: { x: 490, y: 320 } },
+    'observability':   { anchor: { x: 650, y: 320 } }
+  };
+
+  function matchTarget(name) {
+    var n = name.toLowerCase();
+    if (/inference|api|model/.test(n))               return 'model-provider';
+    if (/context|memory|stateful/.test(n))            return 'agent-container';
+    if (/vector|embedding|retrieval/.test(n))         return 'vector-db';
+    if (/orchestrat|langchain|autogen|agent/.test(n)) return 'orchestration';
+    if (/observ|log|monitor|trace/.test(n))           return 'observability';
+    return 'orchestration';
+  }
+
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS(SVG_NS, tag);
+    for (var k in attrs) {
+      if (Object.prototype.hasOwnProperty.call(attrs, k)) el.setAttribute(k, attrs[k]);
+    }
+    return el;
+  }
+
+  window.generateCostMap = function () {
+    var data = recalc();
+    var rows = data.rows;
+
+    var pills;
+    if (rows.length <= 8) {
+      pills = rows.map(function (r) { return { name: r.name, total: r.total, target: matchTarget(r.name) }; });
+    } else {
+      var shown = rows.slice(0, 7);
+      var rest  = rows.slice(7);
+      var restTotal = rest.reduce(function (s, r) { return s + r.total; }, 0);
+      pills = shown.map(function (r) { return { name: r.name, total: r.total, target: matchTarget(r.name) }; });
+      pills.push({ name: 'Other components', total: restTotal, target: 'orchestration' });
+    }
+
+    var svg = document.getElementById('costmap-svg');
+    var layer = document.getElementById('costmap-dynamic');
+    while (layer.firstChild) layer.removeChild(layer.firstChild);
+
+    var n = pills.length;
+    var areaTop = 20, areaBottom = 440;
+    var gap = 14;
+    var ph = Math.min(56, (areaBottom - areaTop - gap * (n - 1)) / n);
+    var totalContent = n * ph + gap * (n - 1);
+    var startY = areaTop + Math.max(0, (areaBottom - areaTop - totalContent) / 2);
+    var x = 20, w = 250;
+
+    pills.forEach(function (pill, i) {
+      var y = startY + i * (ph + gap);
+
+      var rect = svgEl('rect', {
+        x: x, y: y, width: w, height: ph, rx: Math.min(12, ph / 2),
+        fill: '#E6F8FB', stroke: '#00B4CC', 'stroke-width': 1.5
+      });
+      var nameText = svgEl('text', {
+        x: x + 16, y: y + ph / 2 - 4,
+        'font-family': "'DM Sans', sans-serif", 'font-weight': 600, 'font-size': 13, fill: '#1A1A2E'
+      });
+      nameText.textContent = truncate(pill.name, 30);
+      var totalText = svgEl('text', {
+        x: x + 16, y: y + ph / 2 + 14,
+        'font-family': "'DM Mono', monospace", 'font-size': 11, fill: '#00808F'
+      });
+      totalText.textContent = fmt(pill.total) + '/mo';
+
+      layer.appendChild(rect);
+      layer.appendChild(nameText);
+      layer.appendChild(totalText);
+
+      var target = ARCH_TARGETS[pill.target];
+      var startPt = { x: x + w, y: y + ph / 2 };
+      var endPt = target.anchor;
+      var midX = (startPt.x + endPt.x) / 2;
+      var path = svgEl('path', {
+        d: 'M ' + startPt.x + ',' + startPt.y + ' C ' + midX + ',' + startPt.y + ' ' + midX + ',' + endPt.y + ' ' + endPt.x + ',' + endPt.y,
+        fill: 'none', stroke: '#8064A2', 'stroke-width': 1.5, 'stroke-dasharray': '4 4',
+        'marker-end': 'url(#arrowhead)', opacity: 0.8
+      });
+      layer.appendChild(path);
+    });
+
+    var totalHeight = Math.max(460, startY + n * (ph + gap) + 20);
+    svg.setAttribute('viewBox', '0 0 800 ' + totalHeight);
+
+    var block = document.getElementById('costmap-block');
+    block.classList.add('visible');
+    document.getElementById('costmap-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  /* ── IMAGE DOWNLOADS ── */
+  function downloadImage(elementId, filename) {
+    var el = document.getElementById(elementId);
+    if (typeof html2canvas !== 'function') {
+      alert('Image export is temporarily unavailable. Please check your connection and try again.');
+      return;
+    }
+    html2canvas(el, { backgroundColor: '#ffffff', scale: 2 }).then(function (canvas) {
+      var link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }).catch(function () {
+      alert('Could not generate the image. Please try again.');
+    });
+  }
+
+  window.downloadReceipt = function () {
+    downloadImage('receipt-capture', 'practicalx-ai-infrastructure-receipt.png');
+  };
+
+  window.downloadCostMap = function () {
+    downloadImage('costmap-capture', 'practicalx-ai-infrastructure-cost-map.png');
+  };
+
+}());
+</script>
+
+</body>
+</html>
