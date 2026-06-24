@@ -16,7 +16,7 @@
 
   .calc-table {
     width: 100%;
-    min-width: 640px;
+    min-width: 820px;
     border-collapse: collapse;
     font-size: clamp(12px, 1.3vw, 14px);
   }
@@ -63,9 +63,10 @@
   .cell-input:hover { background: rgba(128,100,162,0.07); }
   .cell-input:focus { border-color: #8064A2; background: white; }
 
-  .row-name { min-width: 160px; }
-  .row-qty  { min-width: 70px; text-align: right; }
-  .row-unit { min-width: 90px; }
+  .row-name   { min-width: 160px; }
+  .row-qty    { min-width: 70px; text-align: right; }
+  .row-unit   { min-width: 90px; }
+  .row-target { min-width: 160px; cursor: pointer; }
 
   .price-input-wrap {
     display: flex;
@@ -421,6 +422,7 @@
               <th>Qty</th>
               <th>Unit</th>
               <th>Unit Price</th>
+              <th>Maps To</th>
               <th class="col-total">Monthly Total</th>
               <th></th>
             </tr>
@@ -659,11 +661,11 @@
   ];
 
   var INITIAL_ROWS = [
-    { name: 'Inference API calls',     qty: 10000, unit: 'calls/mo',     price: 0.07  },
-    { name: 'Context window growth',   qty: 50000, unit: 'tokens/mo',    price: 0.005 },
-    { name: 'Vector DB + embeddings',  qty: 1,     unit: 'instance/mo',  price: 400   },
-    { name: 'Orchestration compute',   qty: 3,     unit: 'agents/mo',    price: 150   },
-    { name: 'Observability + logging', qty: 1,     unit: 'instance/mo',  price: 200   }
+    { name: 'Inference API calls',     qty: 10000, unit: 'calls/mo',     price: 0.07,  target: 'model-provider'  },
+    { name: 'Context window growth',   qty: 50000, unit: 'tokens/mo',    price: 0.005, target: 'agent-container' },
+    { name: 'Vector DB + embeddings',  qty: 1,     unit: 'instance/mo',  price: 400,   target: 'vector-db'       },
+    { name: 'Orchestration compute',   qty: 3,     unit: 'agents/mo',    price: 150,   target: 'orchestration'   },
+    { name: 'Observability + logging', qty: 1,     unit: 'instance/mo',  price: 200,   target: 'observability'   }
   ];
 
   var tbody = document.getElementById('cost-tbody');
@@ -692,13 +694,22 @@
       '<td><input type="number" class="cell-input row-qty" placeholder="0" min="0" step="any" aria-label="Quantity"></td>' +
       '<td><input type="text" class="cell-input row-unit" placeholder="e.g. /mo" aria-label="Unit" autocomplete="off" spellcheck="false"></td>' +
       '<td><div class="price-input-wrap"><span class="input-prefix">$</span><input type="number" class="cell-input row-price" placeholder="0.00" min="0" step="any" aria-label="Unit price in dollars"></div></td>' +
+      '<td><select class="cell-input row-target" aria-label="Maps to infrastructure component">' +
+        '<option value="model-provider">Model Provider</option>' +
+        '<option value="orchestration">Orchestration Container</option>' +
+        '<option value="agent-container">Agent Container</option>' +
+        '<option value="model-container">Model Container</option>' +
+        '<option value="vector-db">Vector DB</option>' +
+        '<option value="observability">Observability</option>' +
+      '</select></td>' +
       '<td class="row-total-cell"><span class="row-total">$0.00</span></td>' +
       '<td class="row-del-cell"><button type="button" class="row-delete" aria-label="Remove component" onclick="window.deleteCostRow(this)">&times;</button></td>';
 
-    tr.querySelector('.row-name').value  = data.name  || '';
-    tr.querySelector('.row-qty').value   = (data.qty   != null) ? data.qty   : '';
-    tr.querySelector('.row-unit').value  = data.unit  || '';
-    tr.querySelector('.row-price').value = (data.price != null) ? data.price : '';
+    tr.querySelector('.row-name').value   = data.name   || '';
+    tr.querySelector('.row-qty').value    = (data.qty   != null) ? data.qty   : '';
+    tr.querySelector('.row-unit').value   = data.unit   || '';
+    tr.querySelector('.row-price').value  = (data.price != null) ? data.price : '';
+    tr.querySelector('.row-target').value = data.target || 'orchestration';
 
     return tr;
   }
@@ -737,11 +748,12 @@
       var qty   = Math.max(0, parseFloat(tr.querySelector('.row-qty').value)   || 0);
       var price = Math.max(0, parseFloat(tr.querySelector('.row-price').value) || 0);
       return {
-        name:  tr.querySelector('.row-name').value.trim() || 'Untitled component',
-        qty:   qty,
-        unit:  tr.querySelector('.row-unit').value.trim() || '—',
-        price: price,
-        total: qty * price
+        name:   tr.querySelector('.row-name').value.trim() || 'Untitled component',
+        qty:    qty,
+        unit:   tr.querySelector('.row-unit').value.trim() || '—',
+        price:  price,
+        target: tr.querySelector('.row-target').value,
+        total:  qty * price
       };
     });
   }
@@ -819,19 +831,10 @@
     'model-provider':  { anchor: { x: 400, y: 45  } },
     'orchestration':   { anchor: { x: 330, y: 190 } },
     'agent-container': { anchor: { x: 540, y: 200 } },
+    'model-container': { anchor: { x: 330, y: 320 } },
     'vector-db':       { anchor: { x: 490, y: 320 } },
     'observability':   { anchor: { x: 650, y: 320 } }
   };
-
-  function matchTarget(name) {
-    var n = name.toLowerCase();
-    if (/inference|api|model/.test(n))               return 'model-provider';
-    if (/context|memory|stateful/.test(n))            return 'agent-container';
-    if (/vector|embedding|retrieval/.test(n))         return 'vector-db';
-    if (/orchestrat|langchain|autogen|agent/.test(n)) return 'orchestration';
-    if (/observ|log|monitor|trace/.test(n))           return 'observability';
-    return 'orchestration';
-  }
 
   function svgEl(tag, attrs) {
     var el = document.createElementNS(SVG_NS, tag);
@@ -847,12 +850,12 @@
 
     var pills;
     if (rows.length <= 8) {
-      pills = rows.map(function (r) { return { name: r.name, total: r.total, target: matchTarget(r.name) }; });
+      pills = rows.map(function (r) { return { name: r.name, total: r.total, target: r.target }; });
     } else {
       var shown = rows.slice(0, 7);
       var rest  = rows.slice(7);
       var restTotal = rest.reduce(function (s, r) { return s + r.total; }, 0);
-      pills = shown.map(function (r) { return { name: r.name, total: r.total, target: matchTarget(r.name) }; });
+      pills = shown.map(function (r) { return { name: r.name, total: r.total, target: r.target }; });
       pills.push({ name: 'Other components', total: restTotal, target: 'orchestration' });
     }
 
